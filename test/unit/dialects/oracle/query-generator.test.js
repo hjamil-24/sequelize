@@ -28,4 +28,38 @@ if (current.dialect.name === 'oracle') {
       });
     });
   });
+
+  describe('ADD COLUMN', () => {
+    const User = current.define('user', {
+      intCol: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      }
+    }, 
+    {
+      schema: 'foo',
+      timestamps: false
+    });
+
+    it('DEFAULT VALUE FOR BOOLEAN', () => {
+      return expectsql(sql.addColumnQuery(User.getTableName(), 'bool_col', current.normalizeAttribute({
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      })), {
+        default: 'ALTER TABLE "foo"."users" ADD "bool_col" CHAR(1) DEFAULT 1 NOT NULL CHECK ("bool_col" IN(\'1\', \'0\'))'
+      });
+    });
+
+    it('DEFAULT VALUE FOR ENUM', () => {
+      return expectsql(sql.addColumnQuery(User.getTableName(), 'enum_col', current.normalizeAttribute({
+        type: DataTypes.ENUM('happy', 'sad'),
+        allowNull: false,
+        defaultValue: 'happy'
+      })), {
+        default: 'ALTER TABLE "foo"."users" ADD "enum_col" VARCHAR2(512) DEFAULT \'happy\' NOT NULL CHECK ("enum_col" IN(\'happy\', \'sad\'))'
+      });
+    });
+  });
 }

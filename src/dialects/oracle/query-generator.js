@@ -855,6 +855,10 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
     let template;
 
     template = attribute.type.toSql ? attribute.type.toSql() : '';
+    if (attribute.type instanceof DataTypes.JSON) {
+      template += ` CHECK (${this.quoteIdentifier(options.attributeName)} IS JSON)`;
+      return template;
+    }
     if (Utils.defaultValueSchemable(attribute.defaultValue)) {
       template += ` DEFAULT ${this.escape(attribute.defaultValue)}`;
     }
@@ -870,10 +874,6 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
             return this.escape(value);
           }).join(', ') 
         }))`;
-      return template;
-    } 
-    if (attribute.type instanceof DataTypes.JSON) {
-      template += ` CHECK (${this.quoteIdentifier(options.attributeName)} IS JSON)`;
       return template;
     } 
     if (attribute.type instanceof DataTypes.BOOLEAN) {
