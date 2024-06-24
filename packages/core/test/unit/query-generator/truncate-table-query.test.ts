@@ -13,7 +13,6 @@ describe('QueryGenerator#truncateTableQuery', () => {
       'db2 ibmi': 'TRUNCATE TABLE "myTable" IMMEDIATE',
       'mariadb mysql': 'TRUNCATE `myTable`',
       'postgres snowflake': 'TRUNCATE "myTable"',
-      oracle: `TRUNCATE TABLE "myTable"`,
     });
   });
 
@@ -63,7 +62,6 @@ describe('QueryGenerator#truncateTableQuery', () => {
       'db2 ibmi': 'TRUNCATE TABLE "MyModels" IMMEDIATE',
       'mariadb mysql': 'TRUNCATE `MyModels`',
       'postgres snowflake': 'TRUNCATE "MyModels"',
-      oracle: `TRUNCATE TABLE "MyModels"`,
     });
   });
 
@@ -77,7 +75,6 @@ describe('QueryGenerator#truncateTableQuery', () => {
       'db2 ibmi': 'TRUNCATE TABLE "MyModels" IMMEDIATE',
       'mariadb mysql': 'TRUNCATE `MyModels`',
       'postgres snowflake': 'TRUNCATE "MyModels"',
-      oracle: `TRUNCATE TABLE "MyModels"`,
     });
   });
 
@@ -90,7 +87,6 @@ describe('QueryGenerator#truncateTableQuery', () => {
         'db2 ibmi': 'TRUNCATE TABLE "mySchema"."myTable" IMMEDIATE',
         'mariadb mysql': 'TRUNCATE `mySchema`.`myTable`',
         'postgres snowflake': 'TRUNCATE "mySchema"."myTable"',
-        oracle: 'TRUNCATE TABLE "mySchema"."myTable"',
       },
     );
   });
@@ -108,7 +104,6 @@ describe('QueryGenerator#truncateTableQuery', () => {
         'db2 ibmi': 'TRUNCATE TABLE "myTable" IMMEDIATE',
         'mariadb mysql': 'TRUNCATE `myTable`',
         'postgres snowflake': 'TRUNCATE "myTable"',
-        oracle: `TRUNCATE TABLE "myTable"`,
       },
     );
   });
@@ -123,7 +118,6 @@ describe('QueryGenerator#truncateTableQuery', () => {
       'db2 ibmi': 'TRUNCATE TABLE "mySchema"."myTable" IMMEDIATE',
       'mariadb mysql': 'TRUNCATE `mySchema`.`myTable`',
       'postgres snowflake': 'TRUNCATE "mySchema"."myTable"',
-      oracle: 'TRUNCATE TABLE "mySchema"."myTable"',
     });
   });
 

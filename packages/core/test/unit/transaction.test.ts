@@ -51,7 +51,6 @@ describe('Transaction', () => {
       all: ['START TRANSACTION'],
       snowflake: ['START TRANSACTION NAME "123"'],
       sqlite3: ['BEGIN DEFERRED TRANSACTION'],
-      oracle: ['BEGIN TRANSACTION'],
     };
 
     await sequelize.transaction(async () => {
@@ -66,7 +65,6 @@ describe('Transaction', () => {
       all: ['SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'START TRANSACTION'],
       postgres: ['START TRANSACTION', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED'],
       sqlite3: ['BEGIN DEFERRED TRANSACTION', 'PRAGMA read_uncommitted = 1'],
-      oracle: ['BEGIN TRANSACTION', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED'],
     };
 
     try {

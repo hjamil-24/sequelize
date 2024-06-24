@@ -132,9 +132,6 @@ describe('sequelize.pool', () => {
         snowflake: {
           account: 'replica1',
         },
-        oracle: {
-          host: 'replica1',
-        },
       };
 
       const replica2Overrides: DialectConnectionConfigs = {
@@ -161,9 +158,6 @@ describe('sequelize.pool', () => {
         },
         snowflake: {
           account: 'replica2',
-        },
-        oracle: {
-          host: 'replica1',
         },
       };
 
@@ -235,9 +229,6 @@ describe('sequelize.pool', () => {
         },
         snowflake: {
           account: 'write',
-        },
-        oracle: {
-          host: 'write',
         },
       };
 

@@ -15,7 +15,6 @@ describe('DataTypes.UUID', () => {
       'mariadb mysql': 'CHAR(36) BINARY',
       snowflake: 'VARCHAR(36)',
       sqlite3: 'TEXT',
-      oracle: 'VARCHAR2(36)',
     });
   });
 

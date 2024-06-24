@@ -27,7 +27,6 @@ describe('QueryGenerator#setIsolationLevelQuery', () => {
       sqlite3: 'PRAGMA read_uncommitted = 1',
       snowflake: notSupportedError,
       'db2 ibmi mssql': queryNotSupportedError,
-      oracle: 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED',
     });
   });
 
@@ -39,7 +38,6 @@ describe('QueryGenerator#setIsolationLevelQuery', () => {
       ),
       snowflake: notSupportedError,
       'db2 ibmi mssql': queryNotSupportedError,
-      oracle: 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE',
     });
   });
 

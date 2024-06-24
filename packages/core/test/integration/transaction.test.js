@@ -20,14 +20,6 @@ const current = Support.sequelize;
 const delay = require('delay');
 const pSettle = require('p-settle');
 
-const fromQuery = () => {
-  if (dialect === 'oracle') {
-    return ' FROM DUAL';
-  }
-
-  return '';
-};
-
 describe(Support.getTestDialectTeaser('Transaction'), () => {
   if (!current.dialect.supports.transactions) {
     return;
@@ -116,10 +108,7 @@ describe(Support.getTestDialectTeaser('Transaction'), () => {
         transaction.afterRollback(afterRollback);
         transaction.afterTransaction(afterTransaction);
 
-        return this.sequelize.query(`SELECT 1+1${fromQuery()}`, {
-          transaction,
-          type: QueryTypes.SELECT,
-        });
+        return this.sequelize.query('SELECT 1+1', { transaction, type: QueryTypes.SELECT });
       });
 
       expect(afterCommit).to.have.been.calledOnce;
@@ -271,31 +260,31 @@ describe(Support.getTestDialectTeaser('Transaction'), () => {
 
   it('does not allow queries after commit', async function () {
     const t = await this.sequelize.startUnmanagedTransaction();
-    await this.sequelize.query(`SELECT 1+1${fromQuery()}`, { transaction: t, raw: true });
+    await this.sequelize.query('SELECT 1+1', { transaction: t, raw: true });
     await t.commit();
-    await expect(this.sequelize.query(`SELECT 1+1${fromQuery()}`, { transaction: t, raw: true }))
+    await expect(this.sequelize.query('SELECT 1+1', { transaction: t, raw: true }))
       .to.be.eventually.rejectedWith(
         Error,
         /commit has been called on this transaction\([^)]+\), you can no longer use it\. \(The rejected query is attached as the 'sql' property of this error\)/,
       )
       .and.have.deep.property('sql')
-      .that.equal(`SELECT 1+1${fromQuery()}`);
+      .that.equal('SELECT 1+1');
   });
 
   it('does not allow queries immediately after commit call', async function () {
     await expect(
       (async () => {
         const t = await this.sequelize.startUnmanagedTransaction();
-        await this.sequelize.query(`SELECT 1+1${fromQuery()}`, { transaction: t, raw: true });
+        await this.sequelize.query('SELECT 1+1', { transaction: t, raw: true });
         await Promise.all([
           expect(t.commit()).to.eventually.be.fulfilled,
-          expect(this.sequelize.query(`SELECT 1+1${fromQuery()}`, { transaction: t, raw: true }))
+          expect(this.sequelize.query('SELECT 1+1', { transaction: t, raw: true }))
             .to.be.eventually.rejectedWith(
               Error,
               /commit has been called on this transaction\([^)]+\), you can no longer use it\. \(The rejected query is attached as the 'sql' property of this error\)/,
             )
             .and.have.deep.property('sql')
-            .that.equal(`SELECT 1+1${fromQuery()}`),
+            .that.equal('SELECT 1+1'),
         ]);
       })(),
     ).to.be.eventually.fulfilled;
@@ -305,13 +294,10 @@ describe(Support.getTestDialectTeaser('Transaction'), () => {
     await expect(
       (async () => {
         const t = await this.sequelize.startUnmanagedTransaction();
-        await this.sequelize.query(`SELECT 1+1${fromQuery()}`, { transaction: t, raw: true });
+        await this.sequelize.query('SELECT 1+1', { transaction: t, raw: true });
         await t.rollback();
 
-        return await this.sequelize.query(`SELECT 1+1${fromQuery()}`, {
-          transaction: t,
-          raw: true,
-        });
+        return await this.sequelize.query('SELECT 1+1', { transaction: t, raw: true });
       })(),
     ).to.eventually.be.rejected;
   });
@@ -333,13 +319,13 @@ describe(Support.getTestDialectTeaser('Transaction'), () => {
       this.sequelize.startUnmanagedTransaction().then(async t => {
         await Promise.all([
           expect(t.rollback()).to.eventually.be.fulfilled,
-          expect(this.sequelize.query(`SELECT 1+1${fromQuery()}`, { transaction: t, raw: true }))
+          expect(this.sequelize.query('SELECT 1+1', { transaction: t, raw: true }))
             .to.be.eventually.rejectedWith(
               Error,
               /rollback has been called on this transaction\([^)]+\), you can no longer use it\. \(The rejected query is attached as the 'sql' property of this error\)/,
             )
             .and.have.deep.property('sql')
-            .that.equal(`SELECT 1+1${fromQuery()}`),
+            .that.equal('SELECT 1+1'),
         ]);
       }),
     ).to.eventually.be.fulfilled;

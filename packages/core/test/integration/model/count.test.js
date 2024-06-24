@@ -55,12 +55,7 @@ describe('Model.count', () => {
       });
     });
 
-    if (
-      dialectName !== 'mssql' &&
-      dialectName !== 'db2' &&
-      dialectName !== 'ibmi' &&
-      dialectName !== 'oracle'
-    ) {
+    if (dialectName !== 'mssql' && dialectName !== 'db2' && dialectName !== 'ibmi') {
       describe('aggregate', () => {
         it('allows grouping by aliased attribute', async function () {
           await this.User.aggregate('id', 'count', {

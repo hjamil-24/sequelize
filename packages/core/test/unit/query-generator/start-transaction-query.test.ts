@@ -15,7 +15,6 @@ describe('QueryGenerator#startTransactionQuery', () => {
       default: 'START TRANSACTION',
       sqlite3: 'BEGIN DEFERRED TRANSACTION',
       'db2 ibmi mssql': notSupportedError,
-      oracle: 'BEGIN TRANSACTION',
     });
   });
 
@@ -25,7 +24,6 @@ describe('QueryGenerator#startTransactionQuery', () => {
       snowflake: 'START TRANSACTION NAME "myTransaction"',
       sqlite3: 'BEGIN DEFERRED TRANSACTION',
       'db2 ibmi mssql': notSupportedError,
-      oracle: 'BEGIN TRANSACTION',
     });
   });
 
@@ -88,7 +86,7 @@ describe('QueryGenerator#startTransactionQuery', () => {
         default: buildInvalidOptionReceivedError('startTransactionQuery', dialect.name, [
           'transactionType',
         ]),
-        'snowflake sqlite3 oracle': buildInvalidOptionReceivedError(
+        'snowflake sqlite3': buildInvalidOptionReceivedError(
           'startTransactionQuery',
           dialect.name,
           ['readOnly'],

@@ -13,7 +13,6 @@ describe('QueryGenerator#createSchemaQuery', () => {
     expectsql(() => queryGenerator.createSchemaQuery('mySchema'), {
       default: 'CREATE SCHEMA [mySchema]',
       sqlite3: notSupportedError,
-      oracle: `DECLARE USER_FOUND BOOLEAN := FALSE; BEGIN BEGIN EXECUTE IMMEDIATE 'CREATE USER "mySchema" IDENTIFIED BY 12345 DEFAULT TABLESPACE USERS' ; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -1920 THEN RAISE; ELSE USER_FOUND := TRUE; END IF; END; IF NOT USER_FOUND THEN EXECUTE IMMEDIATE 'GRANT "CONNECT" TO "mySchema"' ; EXECUTE IMMEDIATE 'GRANT CREATE TABLE TO "mySchema"' ; EXECUTE IMMEDIATE 'GRANT CREATE VIEW TO "mySchema"' ; EXECUTE IMMEDIATE 'GRANT CREATE ANY TRIGGER TO "mySchema"' ; EXECUTE IMMEDIATE 'GRANT CREATE ANY PROCEDURE TO "mySchema"' ; EXECUTE IMMEDIATE 'GRANT CREATE SEQUENCE TO "mySchema"' ; EXECUTE IMMEDIATE 'GRANT CREATE SYNONYM TO "mySchema"' ; EXECUTE IMMEDIATE 'ALTER USER "mySchema" QUOTA UNLIMITED ON USERS' ; END IF; END;`,
     });
   });
 
@@ -21,11 +20,9 @@ describe('QueryGenerator#createSchemaQuery', () => {
     expectsql(() => queryGenerator.createSchemaQuery('mySchema', { authorization: 'myUser' }), {
       default: 'CREATE SCHEMA [mySchema] AUTHORIZATION [myUser]',
       sqlite3: notSupportedError,
-      'mariadb mysql snowflake oracle': buildInvalidOptionReceivedError(
-        'createSchemaQuery',
-        dialectName,
-        ['authorization'],
-      ),
+      'mariadb mysql snowflake': buildInvalidOptionReceivedError('createSchemaQuery', dialectName, [
+        'authorization',
+      ]),
     });
   });
 
@@ -35,7 +32,7 @@ describe('QueryGenerator#createSchemaQuery', () => {
       {
         default: 'CREATE SCHEMA [mySchema] AUTHORIZATION CURRENT USER',
         sqlite3: notSupportedError,
-        'mariadb mysql snowflake oracle': buildInvalidOptionReceivedError(
+        'mariadb mysql snowflake': buildInvalidOptionReceivedError(
           'createSchemaQuery',
           dialectName,
           ['authorization'],
@@ -71,7 +68,7 @@ describe('QueryGenerator#createSchemaQuery', () => {
   it('supports the ifNotExists option', () => {
     expectsql(() => queryGenerator.createSchemaQuery('mySchema', { ifNotExists: true }), {
       default: 'CREATE SCHEMA IF NOT EXISTS [mySchema]',
-      'db2 ibmi mssql oracle': buildInvalidOptionReceivedError('createSchemaQuery', dialectName, [
+      'db2 ibmi mssql': buildInvalidOptionReceivedError('createSchemaQuery', dialectName, [
         'ifNotExists',
       ]),
       sqlite3: notSupportedError,
@@ -121,11 +118,6 @@ describe('QueryGenerator#createSchemaQuery', () => {
           'replace',
         ]),
         snowflake: buildInvalidOptionReceivedError('createSchemaQuery', dialectName, [
-          'authorization',
-          'charset',
-          'collate',
-        ]),
-        oracle: buildInvalidOptionReceivedError('createSchemaQuery', dialectName, [
           'authorization',
           'charset',
           'collate',

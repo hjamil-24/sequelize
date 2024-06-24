@@ -75,10 +75,6 @@ describe('QueryGenerator#describeTableQuery', () => {
         ON QSYS2.SYSCSTCOL.CONSTRAINT_NAME = QSYS2.SYSCST.CONSTRAINT_NAME
         WHERE QSYS2.SYSCOLUMNS.TABLE_SCHEMA = CURRENT SCHEMA
         AND QSYS2.SYSCOLUMNS.TABLE_NAME = 'myTable'`,
-      oracle: `SELECT atc.COLUMN_NAME, atc.DATA_TYPE, atc.DATA_LENGTH, atc.CHAR_LENGTH, atc.DEFAULT_LENGTH, atc.NULLABLE, ucc.constraint_type FROM all_tab_columns atc
-        LEFT OUTER JOIN (SELECT acc.column_name, acc.table_name, ac.constraint_type FROM all_cons_columns acc 
-        INNER JOIN all_constraints ac ON acc.constraint_name = ac.constraint_name) ucc ON (atc.table_name = ucc.table_name AND atc.COLUMN_NAME = ucc.COLUMN_NAME)
-        WHERE (atc.OWNER = '${dialect.getDefaultSchema()}') AND (atc.TABLE_NAME = 'myTable')ORDER BY atc.COLUMN_NAME, CONSTRAINT_TYPE DESC`,
     });
   });
 
@@ -154,10 +150,6 @@ describe('QueryGenerator#describeTableQuery', () => {
         ON QSYS2.SYSCSTCOL.CONSTRAINT_NAME = QSYS2.SYSCST.CONSTRAINT_NAME
         WHERE QSYS2.SYSCOLUMNS.TABLE_SCHEMA = CURRENT SCHEMA
         AND QSYS2.SYSCOLUMNS.TABLE_NAME = 'MyModels'`,
-      oracle: `SELECT atc.COLUMN_NAME, atc.DATA_TYPE, atc.DATA_LENGTH, atc.CHAR_LENGTH, atc.DEFAULT_LENGTH, atc.NULLABLE, ucc.constraint_type FROM all_tab_columns atc
-        LEFT OUTER JOIN (SELECT acc.column_name, acc.table_name, ac.constraint_type FROM all_cons_columns acc
-        INNER JOIN all_constraints ac ON acc.constraint_name = ac.constraint_name) ucc ON (atc.table_name = ucc.table_name AND atc.COLUMN_NAME = ucc.COLUMN_NAME)
-        WHERE (atc.OWNER = '${dialect.getDefaultSchema()}') AND (atc.TABLE_NAME = 'MyModels')ORDER BY atc.COLUMN_NAME, CONSTRAINT_TYPE DESC`,
     });
   });
 
@@ -234,11 +226,6 @@ describe('QueryGenerator#describeTableQuery', () => {
         ON QSYS2.SYSCSTCOL.CONSTRAINT_NAME = QSYS2.SYSCST.CONSTRAINT_NAME
         WHERE QSYS2.SYSCOLUMNS.TABLE_SCHEMA = CURRENT SCHEMA
         AND QSYS2.SYSCOLUMNS.TABLE_NAME = 'MyModels'`,
-      oracle: `SELECT
-        atc.COLUMN_NAME, atc.DATA_TYPE, atc.DATA_LENGTH, atc.CHAR_LENGTH, atc.DEFAULT_LENGTH, atc.NULLABLE, ucc.constraint_type
-        FROM all_tab_columns atc
-        LEFT OUTER JOIN (SELECT acc.column_name, acc.table_name, ac.constraint_type FROM all_cons_columns acc INNER JOIN all_constraints ac ON acc.constraint_name = ac.constraint_name) ucc
-        ON (atc.table_name = ucc.table_name AND atc.COLUMN_NAME = ucc.COLUMN_NAME) WHERE (atc.OWNER = '${dialect.getDefaultSchema()}') AND (atc.TABLE_NAME = 'MyModels')ORDER BY atc.COLUMN_NAME, CONSTRAINT_TYPE DESC`,
     });
   });
 
@@ -312,10 +299,6 @@ describe('QueryGenerator#describeTableQuery', () => {
         ON QSYS2.SYSCSTCOL.CONSTRAINT_NAME = QSYS2.SYSCST.CONSTRAINT_NAME
         WHERE QSYS2.SYSCOLUMNS.TABLE_SCHEMA = 'mySchema'
         AND QSYS2.SYSCOLUMNS.TABLE_NAME = 'myTable'`,
-        oracle: `SELECT atc.COLUMN_NAME, atc.DATA_TYPE, atc.DATA_LENGTH, atc.CHAR_LENGTH, atc.DEFAULT_LENGTH, atc.NULLABLE, ucc.constraint_type FROM all_tab_columns atc
-        LEFT OUTER JOIN (SELECT acc.column_name, acc.table_name, ac.constraint_type FROM all_cons_columns acc
-        INNER JOIN all_constraints ac ON acc.constraint_name = ac.constraint_name) ucc ON (atc.table_name = ucc.table_name AND atc.COLUMN_NAME = ucc.COLUMN_NAME)
-        WHERE (atc.OWNER = 'mySchema') AND (atc.TABLE_NAME = 'myTable')ORDER BY atc.COLUMN_NAME, CONSTRAINT_TYPE DESC`,
       },
     );
   });
@@ -395,10 +378,6 @@ describe('QueryGenerator#describeTableQuery', () => {
         ON QSYS2.SYSCSTCOL.CONSTRAINT_NAME = QSYS2.SYSCST.CONSTRAINT_NAME
         WHERE QSYS2.SYSCOLUMNS.TABLE_SCHEMA = CURRENT SCHEMA
         AND QSYS2.SYSCOLUMNS.TABLE_NAME = 'myTable'`,
-        oracle: `SELECT atc.COLUMN_NAME, atc.DATA_TYPE, atc.DATA_LENGTH, atc.CHAR_LENGTH, atc.DEFAULT_LENGTH, atc.NULLABLE, ucc.constraint_type FROM all_tab_columns atc
-        LEFT OUTER JOIN (SELECT acc.column_name, acc.table_name, ac.constraint_type FROM all_cons_columns acc
-        INNER JOIN all_constraints ac ON acc.constraint_name = ac.constraint_name) ucc ON (atc.table_name = ucc.table_name AND atc.COLUMN_NAME = ucc.COLUMN_NAME)
-        WHERE (atc.OWNER = '${dialect.getDefaultSchema()}') AND (atc.TABLE_NAME = 'myTable')ORDER BY atc.COLUMN_NAME, CONSTRAINT_TYPE DESC`,
       },
     );
   });
@@ -476,10 +455,6 @@ describe('QueryGenerator#describeTableQuery', () => {
         ON QSYS2.SYSCSTCOL.CONSTRAINT_NAME = QSYS2.SYSCST.CONSTRAINT_NAME
         WHERE QSYS2.SYSCOLUMNS.TABLE_SCHEMA = 'mySchema'
         AND QSYS2.SYSCOLUMNS.TABLE_NAME = 'myTable'`,
-      oracle: `SELECT atc.COLUMN_NAME, atc.DATA_TYPE, atc.DATA_LENGTH, atc.CHAR_LENGTH, atc.DEFAULT_LENGTH, atc.NULLABLE, ucc.constraint_type FROM all_tab_columns atc
-        LEFT OUTER JOIN (SELECT acc.column_name, acc.table_name, ac.constraint_type FROM all_cons_columns acc
-        INNER JOIN all_constraints ac ON acc.constraint_name = ac.constraint_name) ucc ON (atc.table_name = ucc.table_name AND atc.COLUMN_NAME = ucc.COLUMN_NAME)
-        WHERE (atc.OWNER = 'mySchema') AND (atc.TABLE_NAME = 'myTable')ORDER BY atc.COLUMN_NAME, CONSTRAINT_TYPE DESC`,
     });
   });
 

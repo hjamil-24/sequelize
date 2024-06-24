@@ -10,7 +10,6 @@ describe('QueryGenerator#dropTableQuery', () => {
   it('produces a query that drops a table', () => {
     expectsql(() => queryGenerator.dropTableQuery('myTable'), {
       default: `DROP TABLE IF EXISTS [myTable]`,
-      oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "myTable" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
     });
   });
 
@@ -18,7 +17,6 @@ describe('QueryGenerator#dropTableQuery', () => {
     expectsql(() => queryGenerator.dropTableQuery('myTable', { cascade: true }), {
       default: buildInvalidOptionReceivedError('dropTableQuery', dialectName, ['cascade']),
       'postgres snowflake': `DROP TABLE IF EXISTS "myTable" CASCADE`,
-      oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "myTable" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
     });
   });
 
@@ -27,7 +25,6 @@ describe('QueryGenerator#dropTableQuery', () => {
 
     expectsql(() => queryGenerator.dropTableQuery(MyModel), {
       default: `DROP TABLE IF EXISTS [MyModels]`,
-      oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "MyModels" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
     });
   });
 
@@ -37,7 +34,6 @@ describe('QueryGenerator#dropTableQuery', () => {
 
     expectsql(() => queryGenerator.dropTableQuery(myDefinition), {
       default: `DROP TABLE IF EXISTS [MyModels]`,
-      oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "MyModels" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
     });
   });
 
@@ -45,7 +41,6 @@ describe('QueryGenerator#dropTableQuery', () => {
     expectsql(() => queryGenerator.dropTableQuery({ tableName: 'myTable', schema: 'mySchema' }), {
       default: `DROP TABLE IF EXISTS [mySchema].[myTable]`,
       sqlite3: 'DROP TABLE IF EXISTS `mySchema.myTable`',
-      oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "mySchema"."myTable" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
     });
   });
 
@@ -55,7 +50,6 @@ describe('QueryGenerator#dropTableQuery', () => {
         queryGenerator.dropTableQuery({ tableName: 'myTable', schema: dialect.getDefaultSchema() }),
       {
         default: `DROP TABLE IF EXISTS [myTable]`,
-        oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "myTable" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
       },
     );
   });
@@ -67,7 +61,6 @@ describe('QueryGenerator#dropTableQuery', () => {
     expectsql(() => queryGeneratorSchema.dropTableQuery('myTable'), {
       default: `DROP TABLE IF EXISTS [mySchema].[myTable]`,
       sqlite3: 'DROP TABLE IF EXISTS `mySchema.myTable`',
-      oracle: `BEGIN EXECUTE IMMEDIATE 'DROP TABLE "mySchema"."myTable" CASCADE CONSTRAINTS PURGE'; EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; END;`,
     });
   });
 

@@ -21,7 +21,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'mssql postgres db2 ibmi': 'SMALLINT',
           'mysql mariadb': 'TINYINT',
           'sqlite3 snowflake': 'INTEGER',
-          oracle: 'NUMBER(3)',
         },
       },
       {
@@ -32,7 +31,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'mssql postgres db2 ibmi': 'SMALLINT',
           'mysql mariadb': 'TINYINT(2)',
           'sqlite3 snowflake': 'INTEGER',
-          oracle: 'NUMBER(3)',
         },
       },
       {
@@ -42,7 +40,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'mssql postgres db2 ibmi': 'SMALLINT',
           'mysql mariadb': 'TINYINT(2)',
           'sqlite3 snowflake': 'INTEGER',
-          oracle: 'NUMBER(3)',
         },
       },
       {
@@ -56,7 +53,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'sqlite3 snowflake': 'INTEGER',
           // TINYINT is unsigned in mssql
           mssql: 'TINYINT',
-          oracle: 'NUMBER(3)',
         },
       },
       {
@@ -67,7 +63,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'mysql mariadb': 'TINYINT(2) UNSIGNED',
           'sqlite3 snowflake': 'INTEGER',
           mssql: 'TINYINT',
-          oracle: 'NUMBER(3)',
         },
       },
       {
@@ -160,7 +155,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         expect: {
           default: 'SMALLINT',
           'sqlite3 snowflake': 'INTEGER',
-          oracle: 'SMALLINT',
         },
       },
       {
@@ -170,7 +164,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           default: 'SMALLINT',
           'sqlite3 snowflake': 'INTEGER',
           'mysql mariadb': 'SMALLINT(4)',
-          oracle: 'NUMBER(4,0)',
         },
       },
       {
@@ -180,7 +173,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           default: 'SMALLINT',
           'sqlite3 snowflake': 'INTEGER',
           'mysql mariadb': 'SMALLINT(4)',
-          oracle: 'NUMBER(4,0)',
         },
       },
       {
@@ -192,7 +184,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'sqlite3 snowflake': 'INTEGER',
           'postgres db2 ibmi': 'INTEGER',
           mssql: 'INT',
-          oracle: 'SMALLINT',
         },
       },
       {
@@ -203,7 +194,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'sqlite3 snowflake': 'INTEGER',
           'postgres db2 ibmi': 'INTEGER',
           mssql: 'INT',
-          oracle: 'NUMBER(4,0)',
         },
       },
       {
@@ -297,7 +287,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
           'mariadb mysql': 'MEDIUMINT',
           // falls back to larger type + CHECK constraint
           'db2 ibmi mssql postgres snowflake sqlite3': 'INTEGER',
-          oracle: 'NUMBER(8)',
         },
       },
       {
@@ -306,7 +295,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         expect: {
           'mariadb mysql': 'MEDIUMINT(2)',
           'db2 ibmi mssql postgres snowflake sqlite3': 'INTEGER',
-          oracle: 'NUMBER(8)',
         },
       },
       {
@@ -315,7 +303,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         expect: {
           'mariadb mysql': 'MEDIUMINT(2)',
           'db2 ibmi mssql postgres snowflake sqlite3': 'INTEGER',
-          oracle: 'NUMBER(8)',
         },
       },
       {
@@ -324,7 +311,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         expect: {
           'mariadb mysql': 'MEDIUMINT UNSIGNED',
           'db2 ibmi mssql postgres snowflake sqlite3': 'INTEGER',
-          oracle: 'NUMBER(8)',
         },
       },
       {
@@ -333,7 +319,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         expect: {
           'mariadb mysql': 'MEDIUMINT(2) UNSIGNED',
           'db2 ibmi mssql postgres snowflake sqlite3': 'INTEGER',
-          oracle: 'NUMBER(8)',
         },
       },
       {
@@ -425,7 +410,7 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
 
     testDataTypeSql('INTEGER.UNSIGNED', DataTypes.INTEGER.UNSIGNED, {
       // sqlite & snowflake are both 64 bits integers (actually snowflake accepts up to 99999999999999999999999999999999999999)
-      'sqlite3 oracle snowflake': 'INTEGER',
+      'sqlite3 snowflake': 'INTEGER',
       'mysql mariadb': 'INTEGER UNSIGNED',
       'ibmi postgres db2 mssql': 'BIGINT',
     });
@@ -438,20 +423,17 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
     testDataTypeSql('INTEGER(11)', DataTypes.INTEGER(11), {
       default: 'INTEGER',
       'mysql mariadb': 'INTEGER(11)',
-      oracle: 'NUMBER(11,0)',
     });
 
     testDataTypeSql('INTEGER({ length: 11 })', DataTypes.INTEGER({ length: 11 }), {
       default: 'INTEGER',
       'mysql mariadb': 'INTEGER(11)',
-      oracle: 'NUMBER(11,0)',
     });
 
     testDataTypeSql('INTEGER(11).UNSIGNED', DataTypes.INTEGER(11).UNSIGNED, {
       'mysql mariadb': 'INTEGER(11) UNSIGNED',
       'sqlite3 snowflake': 'INTEGER',
       'ibmi postgres db2 mssql': 'BIGINT',
-      oracle: 'NUMBER(11,0)',
     });
 
     testDataTypeSql('INTEGER(11).UNSIGNED.ZEROFILL', DataTypes.INTEGER(11).UNSIGNED.ZEROFILL, {
@@ -510,7 +492,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
       testDataTypeSql('BIGINT', DataTypes.BIGINT, {
         default: 'BIGINT',
         'sqlite3 snowflake': 'INTEGER',
-        oracle: 'NUMBER(19, 0)',
       });
 
       testDataTypeSql('BIGINT.UNSIGNED', DataTypes.BIGINT.UNSIGNED, {
@@ -518,7 +499,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         'mysql mariadb': 'BIGINT UNSIGNED',
         // INTEGER in snowflake goes up to 99999999999999999999999999999999999999, which is enough to store an unsigned 64-bit integer.
         snowflake: 'INTEGER',
-        oracle: 'NUMBER(19, 0)',
       });
 
       testDataTypeSql('BIGINT.UNSIGNED.ZEROFILL', DataTypes.BIGINT.UNSIGNED.ZEROFILL, {
@@ -530,14 +510,12 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         default: 'BIGINT',
         'sqlite3 snowflake': 'INTEGER',
         'mysql mariadb': 'BIGINT(11)',
-        oracle: 'NUMBER(19, 0)',
       });
 
       testDataTypeSql('BIGINT({ length: 11 })', DataTypes.BIGINT({ length: 11 }), {
         default: 'BIGINT',
         'sqlite3 snowflake': 'INTEGER',
         'mysql mariadb': 'BIGINT(11)',
-        oracle: 'NUMBER(19, 0)',
       });
 
       testDataTypeSql('BIGINT(11).UNSIGNED', DataTypes.BIGINT(11).UNSIGNED, {
@@ -545,7 +523,6 @@ See https://sequelize.org/docs/v7/models/data-types/ for a list of supported dat
         default: unsignedUnsupportedError,
         'mysql mariadb': 'BIGINT(11) UNSIGNED',
         snowflake: 'INTEGER',
-        oracle: 'NUMBER(19, 0)',
       });
 
       testDataTypeSql('BIGINT(11).UNSIGNED.ZEROFILL', DataTypes.BIGINT(11).UNSIGNED.ZEROFILL, {

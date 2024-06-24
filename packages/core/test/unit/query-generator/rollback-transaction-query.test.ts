@@ -12,7 +12,6 @@ describe('QueryGenerator#rollbackTransactionQuery', () => {
     expectsql(() => queryGenerator.rollbackTransactionQuery(), {
       default: 'ROLLBACK',
       'db2 ibmi mssql': notSupportedError,
-      oracle: 'ROLLBACK TRANSACTION',
     });
   });
 });

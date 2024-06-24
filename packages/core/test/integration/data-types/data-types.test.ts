@@ -128,16 +128,13 @@ describe('DataTypes', () => {
       return { User };
     });
 
-    (dialect.name !== 'oracle' ? it : it.skip)('accepts strings', async () => {
+    it('accepts strings', async () => {
       await testSimpleInOut(vars.User, 'binaryStringAttr', 'abc', 'abc');
     });
 
-    (dialect.name !== 'oracle' ? it : it.skip)(
-      'is deserialized as a string when DataType is not specified',
-      async () => {
-        await testSimpleInOutRaw(vars.User, 'binaryStringAttr', 'abc', 'abc');
-      },
-    );
+    it('is deserialized as a string when DataType is not specified', async () => {
+      await testSimpleInOutRaw(vars.User, 'binaryStringAttr', 'abc', 'abc');
+    });
   });
 
   describe('STRING(100).BINARY', () => {
@@ -167,7 +164,7 @@ describe('DataTypes', () => {
     });
 
     // TODO: add length check constraint in sqlite
-    if (dialect.name !== 'sqlite3' && dialect.name !== 'oracle') {
+    if (dialect.name !== 'sqlite3') {
       it('throws if the string is too long', async () => {
         await expect(
           vars.User.create({
@@ -203,13 +200,9 @@ describe('DataTypes', () => {
       await testSimpleInOut(vars.User, 'textAttr', '123456', '123456');
     });
 
-    // For raw queries, Oracle expects hex string during insertion
-    (dialect.name === 'oracle' ? it.skip : it)(
-      'is deserialized as a string when DataType is not specified',
-      async () => {
-        await testSimpleInOutRaw(vars.User, 'textAttr', 'abc', 'abc');
-      },
-    );
+    it('is deserialized as a string when DataType is not specified', async () => {
+      await testSimpleInOutRaw(vars.User, 'textAttr', 'abc', 'abc');
+    });
   });
 
   describe(`TEXT(<size>)`, () => {
@@ -317,72 +310,70 @@ describe('DataTypes', () => {
     });
   });
 
-  if (dialect.name !== 'oracle') {
-    describe('CHAR(<length>).BINARY', () => {
-      if (!dialect.supports.dataTypes.CHAR) {
-        it('throws, because this dialect does not support CHAR', async () => {
-          expect(() => {
-            sequelize.define('CrashedModel', {
-              attr: DataTypes.CHAR(5),
-            });
-          }).to.throwWithCause(`${dialect.name} does not support the CHAR data type.`);
-        });
+  describe('CHAR(<length>).BINARY', () => {
+    if (!dialect.supports.dataTypes.CHAR) {
+      it('throws, because this dialect does not support CHAR', async () => {
+        expect(() => {
+          sequelize.define('CrashedModel', {
+            attr: DataTypes.CHAR(5),
+          });
+        }).to.throwWithCause(`${dialect.name} does not support the CHAR data type.`);
+      });
 
-        return;
+      return;
+    }
+
+    if (!dialect.supports.dataTypes.COLLATE_BINARY) {
+      it('throws if CHAR.BINARY is used', () => {
+        expect(() => {
+          sequelize.define('CrashedModel', {
+            attr: DataTypes.CHAR(5).BINARY,
+          });
+        }).to.throwWithCause(`${dialect.name} does not support the CHAR.BINARY data type.`);
+      });
+
+      return;
+    }
+
+    const vars = beforeAll2(async () => {
+      class User extends Model<InferAttributes<User>> {
+        declare binaryCharAttr: string | ArrayBuffer | Uint8Array | Blob;
       }
 
-      if (!dialect.supports.dataTypes.COLLATE_BINARY) {
-        it('throws if CHAR.BINARY is used', () => {
-          expect(() => {
-            sequelize.define('CrashedModel', {
-              attr: DataTypes.CHAR(5).BINARY,
-            });
-          }).to.throwWithCause(`${dialect.name} does not support the CHAR.BINARY data type.`);
-        });
-
-        return;
-      }
-
-      const vars = beforeAll2(async () => {
-        class User extends Model<InferAttributes<User>> {
-          declare binaryCharAttr: string | ArrayBuffer | Uint8Array | Blob;
-        }
-
-        User.init(
-          {
-            binaryCharAttr: {
-              type: DataTypes.CHAR(5).BINARY,
-              allowNull: false,
-            },
+      User.init(
+        {
+          binaryCharAttr: {
+            type: DataTypes.CHAR(5).BINARY,
+            allowNull: false,
           },
-          { sequelize },
-        );
+        },
+        { sequelize },
+      );
 
-        await User.sync({ force: true });
+      await User.sync({ force: true });
 
-        return { User };
-      });
-
-      it('is serialized/deserialized as strings', async () => {
-        // mysql does not pad columns, unless PAD_CHAR_TO_FULL_LENGTH is true
-        if (dialect.name === 'db2') {
-          await testSimpleInOut(vars.User, 'binaryCharAttr', '1234', '1234 ');
-        } else {
-          await testSimpleInOut(vars.User, 'binaryCharAttr', '1234', '1234');
-        }
-      });
-
-      it('is deserialized as a string when DataType is not specified', async () => {
-        // mysql does not pad columns, unless PAD_CHAR_TO_FULL_LENGTH is true
-        // https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_pad_char_to_full_length
-        if (dialect.name === 'db2') {
-          await testSimpleInOutRaw(vars.User, 'binaryCharAttr', Buffer.from(' 234'), ' 234 ');
-        } else {
-          await testSimpleInOutRaw(vars.User, 'binaryCharAttr', Buffer.from(' 234'), ' 234');
-        }
-      });
+      return { User };
     });
-  }
+
+    it('is serialized/deserialized as strings', async () => {
+      // mysql does not pad columns, unless PAD_CHAR_TO_FULL_LENGTH is true
+      if (dialect.name === 'db2') {
+        await testSimpleInOut(vars.User, 'binaryCharAttr', '1234', '1234 ');
+      } else {
+        await testSimpleInOut(vars.User, 'binaryCharAttr', '1234', '1234');
+      }
+    });
+
+    it('is deserialized as a string when DataType is not specified', async () => {
+      // mysql does not pad columns, unless PAD_CHAR_TO_FULL_LENGTH is true
+      // https://dev.mysql.com/doc/refman/8.0/en/sql-mode.html#sqlmode_pad_char_to_full_length
+      if (dialect.name === 'db2') {
+        await testSimpleInOutRaw(vars.User, 'binaryCharAttr', Buffer.from(' 234'), ' 234 ');
+      } else {
+        await testSimpleInOutRaw(vars.User, 'binaryCharAttr', Buffer.from(' 234'), ' 234');
+      }
+    });
+  });
 
   describe('CITEXT', () => {
     if (!dialect.supports.dataTypes.CITEXT) {
@@ -555,12 +546,6 @@ describe('DataTypes', () => {
         await testSimpleInOutRaw(vars.User, 'booleanAttr', true, 1);
         await testSimpleInOutRaw(vars.User, 'booleanAttr', false, 0);
       });
-    } else if (dialect.name === 'oracle') {
-      // Oracle uses CHAR(1).
-      it('is deserialized as a char string when DataType is not specified', async () => {
-        await testSimpleInOutRaw(vars.User, 'booleanAttr', true, '1');
-        await testSimpleInOutRaw(vars.User, 'booleanAttr', false, '0');
-      });
     } else {
       it('is deserialized as a boolean when DataType is not specified', async () => {
         await testSimpleInOutRaw(vars.User, 'booleanAttr', true, true);
@@ -614,10 +599,7 @@ describe('DataTypes', () => {
 
       it('accepts numbers, bigints, strings', async () => {
         await testSimpleInOut(vars.User, 'intAttr', 123, 123);
-        if (dialect.name !== 'oracle') {
-          await testSimpleInOut(vars.User, 'intAttr', 123n, 123);
-        }
-
+        await testSimpleInOut(vars.User, 'intAttr', 123n, 123);
         await testSimpleInOut(vars.User, 'intAttr', '123', 123);
 
         await testSimpleInOut(
@@ -683,10 +665,7 @@ describe('DataTypes', () => {
 
       it('accepts numbers, bigints, strings', async () => {
         await testSimpleInOut(vars.User, 'intAttr', 123, 123);
-        if (dialect.name !== 'oracle') {
-          await testSimpleInOut(vars.User, 'intAttr', 123n, 123);
-        }
-
+        await testSimpleInOut(vars.User, 'intAttr', 123n, 123);
         await testSimpleInOut(vars.User, 'intAttr', '123', 123);
 
         await testSimpleInOut(
@@ -750,10 +729,8 @@ describe('DataTypes', () => {
       });
 
       it('rejects unsafe integers', async () => {
-        if (dialect.name !== 'oracle') {
-          await expect(vars.User.create({ bigintAttr: 9_007_199_254_740_992 })).to.be.rejected;
-          await expect(vars.User.create({ bigintAttr: -9_007_199_254_740_992 })).to.be.rejected;
-        }
+        await expect(vars.User.create({ bigintAttr: 9_007_199_254_740_992 })).to.be.rejected;
+        await expect(vars.User.create({ bigintAttr: -9_007_199_254_740_992 })).to.be.rejected;
 
         await expect(vars.User.create({ bigintAttr: 123.4 })).to.be.rejected;
         await expect(vars.User.create({ bigintAttr: Number.NaN })).to.be.rejected;
@@ -768,11 +745,7 @@ describe('DataTypes', () => {
       });
 
       it('is deserialized as a string when DataType is not specified', async () => {
-        if (dialect.name !== 'oracle') {
-          await testSimpleInOutRaw(vars.User, 'bigintAttr', 123n, '123');
-        } else {
-          await testSimpleInOutRaw(vars.User, 'bigintAttr', 123n, 123);
-        }
+        await testSimpleInOutRaw(vars.User, 'bigintAttr', 123n, '123');
       });
 
       if (dialect.supports.dataTypes.INTS.unsigned) {
@@ -833,10 +806,7 @@ describe('DataTypes', () => {
 
       it(`accepts numbers, bigints, strings, +-Infinity`, async () => {
         await testSimpleInOut(vars.User, 'attr', 100.5, 100.5);
-        if (dialect.name !== 'oracle') {
-          await testSimpleInOut(vars.User, 'attr', 123n, 123);
-        }
-
+        await testSimpleInOut(vars.User, 'attr', 123n, 123);
         await testSimpleInOut(vars.User, 'attr', '100.5', 100.5);
       });
 
@@ -885,9 +855,7 @@ describe('DataTypes', () => {
 
       it(`is deserialized as a JS number when DataType is not specified`, async () => {
         await testSimpleInOutRaw(vars.User, 'attr', 100.5, 100.5);
-        if (dialect.name !== 'oracle') {
-          await testSimpleInOutRaw(vars.User, 'attr', 123n, 123);
-        }
+        await testSimpleInOutRaw(vars.User, 'attr', 123n, 123);
 
         if (dialect.supports.dataTypes[attrType].NaN) {
           await testSimpleInOutRaw(vars.User, 'attr', Number.NaN, Number.NaN);
@@ -986,10 +954,7 @@ describe('DataTypes', () => {
 
     it('accepts numbers, bigints, strings', async () => {
       await testSimpleInOut(vars.User, 'decimalAttr', 123.4, '123.4');
-      if (dialect.name !== 'oracle') {
-        await testSimpleInOut(vars.User, 'decimalAttr', 123n, '123');
-      }
-
+      await testSimpleInOut(vars.User, 'decimalAttr', 123n, '123');
       await testSimpleInOut(vars.User, 'decimalAttr', '123.4', '123.4');
     });
 
@@ -1015,7 +980,7 @@ describe('DataTypes', () => {
       await expect(vars.User.create({ decimalAttr: 'abc' })).to.be.rejected;
     });
 
-    if (dialect.name === 'sqlite3' || dialect.name === 'oracle') {
+    if (dialect.name === 'sqlite3') {
       // sqlite3 doesn't give us a way to do sql type-based parsing, *and* returns bigints as js numbers.
       // this behavior is undesired but is still tested against to ensure we update this test when this is finally fixed.
       it('is deserialized as a number when DataType is not specified (undesired sqlite limitation)', async () => {
@@ -1068,7 +1033,6 @@ describe('DataTypes', () => {
         123n,
         dialect.name === 'mssql' ? '123' : '123.00',
       );
-
       await testSimpleInOut(
         vars.User,
         'decimalAttr',
@@ -1231,9 +1195,7 @@ describe('DataTypes', () => {
             ? '2022-01-01 00:00:00.000 +00:00'
             : dialect.name === 'db2'
               ? '2022-01-01 00:00:00.000000+00'
-              : dialect.name === 'oracle'
-                ? new Date('2022-01-01T00:00:00Z')
-                : '2022-01-01 00:00:00+00',
+              : '2022-01-01 00:00:00+00',
       );
     });
   });
@@ -1271,7 +1233,7 @@ describe('DataTypes', () => {
 
     it('clamps to specified precision', async () => {
       // sqlite does not support restricting the precision
-      if (dialect.name !== 'sqlite3' && dialect.name !== 'oracle') {
+      if (dialect.name !== 'sqlite3') {
         await testSimpleInOut(
           vars.User,
           'dateMinPrecisionAttr',
@@ -1371,20 +1333,9 @@ describe('DataTypes', () => {
       }
     });
 
-    if (dialect.name === 'oracle') {
-      it(`is deserialized as a date when DataType is not specified`, async () => {
-        await testSimpleInOutRaw(
-          vars.User,
-          'dateAttr',
-          '2022-01-01',
-          new Date('2022-01-01T00:00:00.000Z'),
-        );
-      });
-    } else {
-      it(`is deserialized as a string when DataType is not specified`, async () => {
-        await testSimpleInOutRaw(vars.User, 'dateAttr', '2022-01-01', '2022-01-01');
-      });
-    }
+    it(`is deserialized as a string when DataType is not specified`, async () => {
+      await testSimpleInOutRaw(vars.User, 'dateAttr', '2022-01-01', '2022-01-01');
+    });
   });
 
   describe('TIME(precision)', () => {
@@ -1750,48 +1701,40 @@ describe('DataTypes', () => {
             // TODO: expected for mariadb 10.4 : https://jira.mariadb.org/browse/MDEV-15558
             expect(table.jsonStr.type).to.equal('LONGTEXT');
             break;
-          case 'oracle':
-            expect(table.jsonStr.type).to.equal('BLOB');
-            break;
           default:
             expect(table.jsonStr.type).to.equal(jsonTypeName);
         }
       });
 
-      // Oracle Database < 21 doesn't consider scalars as JSON column
-      // thus, fails the CHECK constraint test.
-      if (dialect.name !== 'oracle') {
-        it('properly serializes default values', async () => {
-          const createdUser = await vars.User.create();
-          await createdUser.reload();
-          expect(createdUser.get()).to.deep.eq({
-            jsonStr: 'abc',
-            jsonBoolean: true,
-            jsonNumber: 1,
-            jsonNull: null,
-            jsonArray: ['a', 'b'],
-            jsonObject: { key: 'abc' },
-            id: 1,
-          });
+      it('properly serializes default values', async () => {
+        const createdUser = await vars.User.create();
+        await createdUser.reload();
+        expect(createdUser.get()).to.deep.eq({
+          jsonStr: 'abc',
+          jsonBoolean: true,
+          jsonNumber: 1,
+          jsonNull: null,
+          jsonArray: ['a', 'b'],
+          jsonObject: { key: 'abc' },
+          id: 1,
         });
+      });
 
-        it('properly serializes values', async () => {
-          await testSimpleInOut(vars.User, 'jsonStr', 'abc', 'abc');
-          await testSimpleInOut(vars.User, 'jsonBoolean', true, true);
-          await testSimpleInOut(vars.User, 'jsonBoolean', false, false);
-          await testSimpleInOut(vars.User, 'jsonNumber', 123.4, 123.4);
-          await testSimpleInOut(vars.User, 'jsonArray', [1, 2], [1, 2]);
-          await testSimpleInOut(vars.User, 'jsonObject', { a: 1 }, { a: 1 });
-          await testSimpleInOut(vars.User, 'jsonNull', null, null);
-        });
-      }
+      it('properly serializes values', async () => {
+        await testSimpleInOut(vars.User, 'jsonStr', 'abc', 'abc');
+        await testSimpleInOut(vars.User, 'jsonBoolean', true, true);
+        await testSimpleInOut(vars.User, 'jsonBoolean', false, false);
+        await testSimpleInOut(vars.User, 'jsonNumber', 123.4, 123.4);
+        await testSimpleInOut(vars.User, 'jsonArray', [1, 2], [1, 2]);
+        await testSimpleInOut(vars.User, 'jsonObject', { a: 1 }, { a: 1 });
+        await testSimpleInOut(vars.User, 'jsonNull', null, null);
+      });
 
       // MariaDB: supports a JSON type, but:
       // - MariaDB 10.5 says it's a JSON col, on which we enabled automatic JSON parsing.
       // - MariaDB 10.4 says it's a string, so we can't parse it based on the type.
-      // Oracle JSON is BLOB column with check `IS JSON`.
       // TODO [2024-06-18]: Re-enable this test when we drop support for MariaDB < 10.5
-      if (dialect.name !== 'mariadb' && dialect.name !== 'oracle') {
+      if (dialect.name !== 'mariadb') {
         if (dialect.name === 'mssql' || dialect.name === 'sqlite3') {
           // MSSQL: does not have a JSON type, so we can't parse it if our DataType is not specified.
           // SQLite: sqlite3 does not tell us the type of a column, we cannot parse based on it.

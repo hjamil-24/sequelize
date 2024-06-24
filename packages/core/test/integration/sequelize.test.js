@@ -21,7 +21,7 @@ const { CONFIG } = require('../config/config');
 const dialect = getTestDialect();
 
 const qq = str => {
-  if (['postgres', 'mssql', 'db2', 'ibmi', 'oracle'].includes(dialect)) {
+  if (['postgres', 'mssql', 'db2', 'ibmi'].includes(dialect)) {
     return `"${str}"`;
   }
 
@@ -61,9 +61,6 @@ const badUsernameConfig = {
   snowflake: {
     account: 'bad_account',
   },
-  oracle: {
-    username: 'bad_user',
-  },
 };
 
 const noPasswordConfig = {
@@ -95,9 +92,6 @@ const noPasswordConfig = {
   snowflake: {
     password: null,
   },
-  oracle: {
-    password: null,
-  },
 };
 
 const badAddressConfig = {
@@ -122,9 +116,6 @@ const badAddressConfig = {
   },
   ibmi: {
     system: 'bad-address',
-  },
-  oracle: {
-    port: 9999,
   },
 };
 
@@ -389,12 +380,6 @@ describe(getTestDialectTeaser('Sequelize'), () => {
 
             case 'db2': {
               expect(error.message).to.include('A communication error has been detected');
-
-              break;
-            }
-
-            case 'oracle': {
-              expect(error.message).to.include('NJS-007');
 
               break;
             }

@@ -25,7 +25,6 @@ describe('QueryGenerator#bulkDeleteQuery', () => {
           "DELETE FROM `myTable` WHERE rowid IN (SELECT rowid FROM `myTable` WHERE `name` = 'barry' LIMIT 10)",
         'db2 ibmi': `DELETE FROM "myTable" WHERE "name" = 'barry' FETCH NEXT 10 ROWS ONLY`,
         'mssql postgres snowflake': limitNotSupportedError,
-        oracle: limitNotSupportedError,
       },
     );
   });
@@ -40,7 +39,6 @@ describe('QueryGenerator#bulkDeleteQuery', () => {
         "DELETE FROM `MyModels` WHERE rowid IN (SELECT rowid FROM `MyModels` WHERE `name` = 'barry' LIMIT 10)",
       'db2 ibmi': `DELETE FROM "MyModels" WHERE "name" = 'barry' FETCH NEXT 10 ROWS ONLY`,
       'postgres snowflake': `DELETE FROM "MyModels" WHERE "id" IN (SELECT "id" FROM "MyModels" WHERE "name" = 'barry' ORDER BY "id" LIMIT 10)`,
-      oracle: `DELETE FROM "MyModels" WHERE rowid IN (SELECT rowid FROM "MyModels" WHERE rownum <= 10 AND "name" = 'barry')`,
     });
   });
 
@@ -57,7 +55,6 @@ describe('QueryGenerator#bulkDeleteQuery', () => {
           "DELETE FROM `MyModels` WHERE rowid IN (SELECT rowid FROM `MyModels` WHERE `name` = 'barry' LIMIT 10)",
         'db2 ibmi': `DELETE FROM "MyModels" WHERE "name" = 'barry' FETCH NEXT 10 ROWS ONLY`,
         'postgres snowflake': `DELETE FROM "MyModels" WHERE "id" IN (SELECT "id" FROM "MyModels" WHERE "name" = 'barry' ORDER BY "id" LIMIT 10)`,
-        oracle: `DELETE FROM "MyModels" WHERE rowid IN (SELECT rowid FROM "MyModels" WHERE rownum <= 10 AND "name" = 'barry')`,
       },
     );
   });
@@ -81,7 +78,6 @@ describe('QueryGenerator#bulkDeleteQuery', () => {
       sqlite3: `DELETE FROM \`MyModels\` WHERE rowid IN (SELECT rowid FROM \`MyModels\` WHERE name = 'Zoe' LIMIT 1)`,
       'db2 ibmi': `DELETE FROM "MyModels" WHERE name = 'Zoe' FETCH NEXT 1 ROWS ONLY`,
       'postgres snowflake': `DELETE FROM "MyModels" WHERE "id" IN (SELECT "id" FROM "MyModels" WHERE name = 'Zoe' ORDER BY "id" LIMIT 1)`,
-      oracle: `DELETE FROM "MyModels" WHERE rowid IN (SELECT rowid FROM "MyModels" WHERE rownum <= :limit AND name = 'Zoe')`,
     });
   });
 
