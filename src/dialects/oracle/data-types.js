@@ -30,6 +30,7 @@ module.exports = BaseTypes => {
   BaseTypes.REAL.types.oracle = ['BINARY_DOUBLE'];
   BaseTypes.DOUBLE.types.oracle = ['BINARY_DOUBLE'];
   BaseTypes.JSON.types.oracle = ['BLOB'];
+  BaseTypes.VECTOR.types.oracle = ['VECTOR'];
   BaseTypes.GEOMETRY.types.oracle = false;
 
   class STRING extends BaseTypes.STRING {
@@ -459,6 +460,23 @@ module.exports = BaseTypes => {
 
   DATEONLY.prototype.escape = false;
 
+  class VECTOR extends BaseTypes.VECTOR {
+    toSql() {
+      if (this._length && this._format) {
+        return `VECTOR(${this._length}, ${this._format})`;
+      } if (this._length) {
+        return `VECTOR(${this._length}, *)`;
+      }
+
+      return 'VECTOR(*, *)';
+    }
+
+    _getBindDef(oracledb) {
+      return { type: oracledb.DB_TYPE_VECTOR };
+    }
+
+  }
+
   return {
     BOOLEAN,
     'DOUBLE PRECISION': DOUBLE,
@@ -481,6 +499,7 @@ module.exports = BaseTypes => {
     CHAR,
     JSON: JSONTYPE,
     REAL,
-    DECIMAL
+    DECIMAL,
+    VECTOR
   };
 };

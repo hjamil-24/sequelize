@@ -11,6 +11,7 @@ const { logger } = require('./utils/logger');
 const warnings = {};
 const { classToInvokable } = require('./utils/class-to-invokable');
 const { joinSQLFragments } = require('./utils/join-sql-fragments');
+const Utils = require('./utils');
 
 class ABSTRACT {
   toString(options) {
@@ -958,6 +959,61 @@ class TSVECTOR extends ABSTRACT {
 }
 
 /**
+ * The VECTOR type stores vectors.
+ *
+ * Only available for Oracle Database >= 23ai
+ *
+ */
+class VECTOR extends ABSTRACT {
+  constructor(dimension, format) {
+    const options = typeof dimension === 'object' && dimension || { dimension, format };
+    super();
+    this.options = options;
+    this._length = typeof dimension === 'object' && dimension.dimension || dimension;
+    this._format = typeof dimension === 'object' && dimension.format || format;
+    // this.cosineDistance = cosineDistance;
+    // this.vectorDistance = vectorDistance;
+    // this.innerProduct = innerProduct;
+    // this.l1Distance = l1Distance;
+    // this.l2Distance = l2Distance;
+    // this.vectorDistance = vectorDistance;
+  }
+  validate(value) {
+    if (!Array.isArray(value)) {
+      throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', value));
+    }
+    return true;
+  }
+
+  cosineDistance(column, value, sequelize) {
+    return distance('COSINE_DISTANCE', column, value, sequelize);
+  }
+  
+  
+  innerProduct(column, value, sequelize) {
+    return distance('INNER_PRODUCT', column, value, sequelize);
+  }
+  
+  l1Distance(column, value, sequelize) {
+    return distance('L1_DISTANCE', column, value, sequelize);
+  }
+  
+  l2Distance(column, value, sequelize) {
+    return distance('L2_DISTANCE', column, value, sequelize);
+  }
+  
+  vectorDistance(column, value, sequelize) {
+    return distance('vector_distance', column, value, sequelize);
+  }
+}
+
+function distance(distanceType, column, value, sequelize) {
+  const quotedColumn = column instanceof Utils.Literal ? column.val : sequelize.dialect.queryGenerator.quoteIdentifier(column);
+  const val = `VECTOR('[${value}]', ${value.length})`;
+  return `${distanceType}(${quotedColumn}, ${val})`;
+}
+
+/**
  * A convenience class holding commonly used data types. The data types are used when defining a new model using `Sequelize.define`, like this:
  * ```js
  * sequelize.define('model', {
@@ -1041,7 +1097,8 @@ const DataTypes = module.exports = {
   INET,
   MACADDR,
   CITEXT,
-  TSVECTOR
+  TSVECTOR,
+  VECTOR
 };
 
 _.each(DataTypes, (dataType, name) => {
