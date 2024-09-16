@@ -971,12 +971,6 @@ class VECTOR extends ABSTRACT {
     this.options = options;
     this._length = typeof dimension === 'object' && dimension.dimension || dimension;
     this._format = typeof dimension === 'object' && dimension.format || format;
-    // this.cosineDistance = cosineDistance;
-    // this.vectorDistance = vectorDistance;
-    // this.innerProduct = innerProduct;
-    // this.l1Distance = l1Distance;
-    // this.l2Distance = l2Distance;
-    // this.vectorDistance = vectorDistance;
   }
   validate(value) {
     if (!Array.isArray(value)) {
