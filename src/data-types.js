@@ -11,7 +11,6 @@ const { logger } = require('./utils/logger');
 const warnings = {};
 const { classToInvokable } = require('./utils/class-to-invokable');
 const { joinSQLFragments } = require('./utils/join-sql-fragments');
-const Utils = require('./utils');
 
 class ABSTRACT {
   toString(options) {
@@ -978,33 +977,6 @@ class VECTOR extends ABSTRACT {
     }
     return true;
   }
-
-  cosineDistance(column, value, sequelize) {
-    return distance('COSINE_DISTANCE', column, value, sequelize);
-  }
-  
-  
-  innerProduct(column, value, sequelize) {
-    return distance('INNER_PRODUCT', column, value, sequelize);
-  }
-  
-  l1Distance(column, value, sequelize) {
-    return distance('L1_DISTANCE', column, value, sequelize);
-  }
-  
-  l2Distance(column, value, sequelize) {
-    return distance('L2_DISTANCE', column, value, sequelize);
-  }
-  
-  vectorDistance(column, value, sequelize) {
-    return distance('vector_distance', column, value, sequelize);
-  }
-}
-
-function distance(distanceType, column, value, sequelize) {
-  const quotedColumn = column instanceof Utils.Literal ? column.val : sequelize.dialect.queryGenerator.quoteIdentifier(column);
-  const val = `VECTOR('[${value}]', ${value.length})`;
-  return `${distanceType}(${quotedColumn}, ${val})`;
 }
 
 /**
