@@ -973,7 +973,7 @@ class VECTOR extends ABSTRACT {
     this._format = typeof dimension === 'object' && dimension.format || format;
   }
   validate(value) {
-    if (!Array.isArray(value)) {
+    if (!ArrayBuffer.isView(value)) {
       throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', value));
     }
     return true;

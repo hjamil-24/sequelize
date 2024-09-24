@@ -461,6 +461,9 @@ module.exports = BaseTypes => {
   DATEONLY.prototype.escape = false;
 
   class VECTOR extends BaseTypes.VECTOR {
+    constructor(dimension, format) {
+      super(dimension, format);
+    }
     toSql() {
       if (this._length && this._format) {
         return `VECTOR(${this._length}, ${this._format})`;
