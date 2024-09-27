@@ -473,6 +473,7 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
 
     if (options.type === 'VECTOR') {
       let idxParameter = 'PARAMETERS (type ';
+      options.using = options.using || 'hnsw';
       if (options.parameter) {
         if (options.using === 'hnsw') {
           idxParameter += 'hnsw';
