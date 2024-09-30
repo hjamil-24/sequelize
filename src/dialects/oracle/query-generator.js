@@ -487,9 +487,11 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
           idxParameter += 'ivf';
           if (options.parameter.partitions) {
             idxParameter += `, NEIGHBOR PARTITION ${options.parameter.partitions}`;
-          } else if (options.parameter.samplesPerPartition) {
+          }
+          if (options.parameter.samplesPerPartition) {
             idxParameter += `, SAMPLES_PER_PARTITION ${options.parameter.samplesPerPartition}`;
-          } else if (options.parameter.minVectors) {
+          }
+          if (options.parameter.minVectors) {
             idxParameter += `, MIN_VECORS_PER_PARTITIONS ${options.parameter.minVectors}`;
           }
         }
@@ -502,7 +504,7 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
         `(${fieldsSql.join(', ')})`,
         'ORAGANIZATION ',
         options.using === 'hnsw' ? 'INMEMORY NEIGHBOR GRAPH ' : 'NEIGHBOR PARTITION GRAPH ',
-        options.distance ? `WITH DISTANCE ${options.distance}` : 'WITH DISTANCE COSINE',
+        options.distance ? `WITH DISTANCE ${options.distance}` : '',
         //with target accuracy
         options.parameter ? idxParameter : ''
       );
