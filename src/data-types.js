@@ -965,11 +965,11 @@ class TSVECTOR extends ABSTRACT {
  */
 class VECTOR extends ABSTRACT {
   constructor(dimension, format) {
-    const options = typeof dimension === 'object' && dimension || { dimension, format };
     super();
+    const options = typeof dimension === 'object' && dimension || { dimension, format };
     this.options = options;
-    this._length = typeof dimension === 'object' && dimension.dimension || dimension;
-    this._format = typeof dimension === 'object' && dimension.format || format;
+    this._format = options.format;
+    this._length = options.dimension;
   }
   validate(value) {
     if (!ArrayBuffer.isView(value)) {
