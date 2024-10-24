@@ -7,6 +7,7 @@ const DataTypes = require('../../data-types');
 const AbstractQueryGenerator = require('../abstract/query-generator');
 const _ = require('lodash');
 const util = require('util');
+const Model = require('../../model');
 const Transaction = require('../../transaction');
 
 /**
@@ -387,7 +388,137 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
     if (typeof tableName !== 'string' && attributes.name) {
       attributes.name = `${tableName.schema}.${attributes.name}`;
     }
-    return super.addIndexQuery(tableName, attributes, options, rawTablename);
+    
+    options = options || {};
+
+    if (!Array.isArray(attributes)) {
+      options = attributes;
+      attributes = undefined;
+    } else {
+      options.fields = attributes;
+    }
+
+    options.prefix = options.prefix || rawTablename || tableName;
+    if (options.prefix && typeof options.prefix === 'string') {
+      options.prefix = options.prefix.replace(/\./g, '_');
+      options.prefix = options.prefix.replace(/("|')/g, '');
+    }
+
+    const fieldsSql = options.fields.map(field => {
+      if (field instanceof Utils.SequelizeMethod) {
+        return this.handleSequelizeMethod(field);
+      }
+      if (typeof field === 'string') {
+        field = {
+          name: field
+        };
+      }
+      let result = '';
+
+      if (field.attribute) {
+        field.name = field.attribute;
+      }
+
+      if (!field.name) {
+        throw new Error(`The following index field has no name: ${util.inspect(field)}`);
+      }
+
+      result += this.quoteIdentifier(field.name);
+
+      // if (this._dialect.supports.index.collate && field.collate) {
+      //   result += ` COLLATE ${this.quoteIdentifier(field.collate)}`;
+      // }
+
+      // if (this._dialect.supports.index.operator) {
+      //   const operator = field.operator || options.operator;
+      //   if (operator) {
+      //     result += ` ${operator}`;
+      //   }
+      // }
+
+      if (this._dialect.supports.index.length && field.length) {
+        result += `(${field.length})`;
+      }
+
+      if (field.order) {
+        result += ` ${field.order}`;
+      }
+
+      return result;
+    });
+
+    if (!options.name) {
+      // Mostly for cases where addIndex is called directly by the user without an options object (for example in migrations)
+      // All calls that go through sequelize should already have a name
+      options = Utils.nameIndex(options, options.prefix);
+    }
+
+    options = Model._conformIndex(options);
+
+    // if (!this._dialect.supports.index.type) {
+    //   delete options.type;
+    // }
+
+    // if (options.where) {
+    //   options.where = this.whereQuery(options.where);
+    // }
+
+    if (typeof tableName === 'string') {
+      tableName = this.quoteIdentifiers(tableName);
+    } else {
+      tableName = this.quoteTable(tableName);
+    }
+
+    let ind = ['CREATE'];
+
+    if (options.type === 'VECTOR') {
+      let idxParameter = 'PARAMETERS (type ';
+      options.using = options.using || 'hnsw';
+      if (options.parameter) {
+        if (options.using === 'hnsw') {
+          idxParameter += 'hnsw';
+          if (options.parameter.neighbor) {
+            idxParameter += `, neighbor ${options.parameter.neighbor}`; 
+          }
+          if (options.parameter.efconstruction) {
+            idxParameter += `, efconstruction ${options.parameter.efconstruction}`;
+          }
+        } else {
+          idxParameter += 'ivf';
+          if (options.parameter.partitions) {
+            idxParameter += `, NEIGHBOR PARTITION ${options.parameter.partitions}`;
+          }
+          if (options.parameter.samplesPerPartition) {
+            idxParameter += `, SAMPLES_PER_PARTITION ${options.parameter.samplesPerPartition}`;
+          }
+          if (options.parameter.minVectors) {
+            idxParameter += `, MIN_VECORS_PER_PARTITIONS ${options.parameter.minVectors}`;
+          }
+        }
+        idxParameter += ')';
+      }
+      ind = ind.concat(
+        options.type, 'INDEX',
+        this.quoteIdentifiers(options.name),
+        `ON ${tableName}`,
+        `(${fieldsSql.join(', ')})`,
+        'ORAGANIZATION ',
+        options.using === 'hnsw' ? 'INMEMORY NEIGHBOR GRAPH ' : 'NEIGHBOR PARTITION GRAPH ',
+        options.distance ? `WITH DISTANCE ${options.distance}` : '',
+        //with target accuracy
+        options.parameter ? idxParameter : ''
+      );
+    } else {
+      ind = ind.concat(
+        options.unique ? 'UNIQUE' : '',
+        'INDEX',
+        this.quoteIdentifiers(options.name),
+        `ON ${tableName}`,
+        `(${fieldsSql.join(', ')})`
+      );
+    }
+
+    return _.compact(ind).join(' ');
   }
 
   addConstraintQuery(tableName, options) {
