@@ -56,6 +56,7 @@ export const INET = Pkg.INET;
 export const MACADDR = Pkg.MACADDR;
 export const CITEXT = Pkg.CITEXT;
 export const TSVECTOR = Pkg.TSVECTOR;
+export const VECTOR = Pkg.VECTOR;
 
 // export * from './lib/model';
 export const Model = Pkg.Model;
