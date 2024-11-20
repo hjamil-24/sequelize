@@ -470,40 +470,12 @@ module.exports = BaseTypes => {
         return `VECTOR(${this._length}, *)`;
       }
 
-      return 'VECTOR(*, *)';
+      return 'VECTOR';
     }
 
     _getBindDef(oracledb) {
       return { type: oracledb.DB_TYPE_VECTOR };
     }
-
-
-  }
-
-  BaseTypes.VECTOR.prototype.cosineDistance = function cosineDistance(column, value, sequelize) {
-    return distance('COSINE_DISTANCE', column, value, sequelize);
-  };
-  
-  BaseTypes.VECTOR.prototype.innerProduct = function innerProduct(column, value, sequelize) {
-    return distance('INNER_PRODUCT', column, value, sequelize);
-  };
-
-  BaseTypes.VECTOR.prototype.l1Distance = function l1Distance(column, value, sequelize) {
-    return distance('L1_DISTANCE', column, value, sequelize);
-  };
-  
-  BaseTypes.VECTOR.prototype.l2Distance = function l2Distance(column, value, sequelize) {
-    return distance('L2_DISTANCE', column, value, sequelize);
-  };
-  
-  BaseTypes.VECTOR.prototype.vectorDistance = function vectorDistance(column, value, sequelize) {
-    return distance('vector_distance', column, value, sequelize);
-  };
-
-  function distance(distanceType, column, value, sequelize) {
-    const quotedColumn = column instanceof Utils.Literal ? column.val : sequelize.dialect.queryGenerator.quoteIdentifier(column);
-    const val = `VECTOR('[${value}]', ${value.length})`;
-    return `${distanceType}(${quotedColumn}, ${val})`;
   }
 
   return {

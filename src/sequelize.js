@@ -991,6 +991,81 @@ class Sequelize {
   }
 
   /**
+   * Generates the cosineDistance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {string}
+   */
+  cosineDistance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.dialect.queryGenerator.cosineDistance(column, value);
+    }
+    return '';
+  }
+
+  /**
+   * Generates the innerProduct clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {string}
+   */
+  innerProduct(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.dialect.queryGenerator.innerProduct(column, value);
+    }
+    return '';
+  }
+
+  /**
+   * Generates the l1Distance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {string}
+   */
+  l1Distance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.dialect.queryGenerator.l1Distance(column, value);
+    }
+    return '';
+  }
+
+  /**
+   * Generates the cl2Distance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {string}
+   */
+  l2Distance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.dialect.queryGenerator.l2Distance(column, value);
+    }
+    return '';
+  }
+
+  /**
+   * Generates the vectorDistance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {string}
+   */
+  vectorDistance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.dialect.queryGenerator.vectorDistance(column, value);
+    }
+    return '';
+  }
+
+  /**
    * Creates an object representing a database function. This can be used in search queries, both in where and order parts, and as default values in column definitions.
    * If you want to refer to columns in your function, you should use `sequelize.col`, so that the columns are properly interpreted as columns and not a strings.
    *

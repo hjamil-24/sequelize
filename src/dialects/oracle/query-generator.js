@@ -1414,6 +1414,27 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
   authTestQuery() {
     return 'SELECT 1+1 AS result FROM DUAL';
   }
+
+  cosineDistance(column, value) {
+    return `COSINE_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
+  }
+
+  innerProduct(column, value) {
+    return `INNER_PRODUCT(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
+  }
+
+  l1Distance(column, value) {
+    return `L1_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
+  }
+
+  l2Distance(column, value) {
+    return `L2_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
+  }
+
+  vectorDistance(column, value) {
+    return `VECTOR_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
+  }
+
 }
 
 /* istanbul ignore next */
