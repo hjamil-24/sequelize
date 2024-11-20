@@ -4,7 +4,6 @@
 
 const moment = require('moment');
 const momentTz = require('moment-timezone');
-const Utils = require('../../utils');
 
 module.exports = BaseTypes => {
   const warn = BaseTypes.ABSTRACT.warn.bind(
