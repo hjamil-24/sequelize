@@ -1000,7 +1000,7 @@ class Sequelize {
    */
   cosineDistance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
-      return this.dialect.queryGenerator.cosineDistance(column, value);
+      return this.fn('COSINE_DISTANCE', column, value);
     }
     return '';
   }
@@ -1015,7 +1015,7 @@ class Sequelize {
    */
   innerProduct(column, value) {
     if (['oracle'].includes(this.getDialect())) {
-      return this.dialect.queryGenerator.innerProduct(column, value);
+      return this.fn('INNER_PRODUCT', column, value);
     }
     return '';
   }
@@ -1030,7 +1030,7 @@ class Sequelize {
    */
   l1Distance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
-      return this.dialect.queryGenerator.l1Distance(column, value);
+      return this.fn('L1_DISTANCE', column, value);
     }
     return '';
   }
@@ -1045,7 +1045,7 @@ class Sequelize {
    */
   l2Distance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
-      return this.dialect.queryGenerator.l2Distance(column, value);
+      return this.fn('L2_DISTANCE', column, value);
     }
     return '';
   }
@@ -1060,7 +1060,7 @@ class Sequelize {
    */
   vectorDistance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
-      return this.dialect.queryGenerator.vectorDistance(column, value);
+      return this.fn('VECTOR_DISTANCE', column, value);
     }
     return '';
   }

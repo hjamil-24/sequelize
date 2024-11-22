@@ -425,17 +425,6 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
 
       result += this.quoteIdentifier(field.name);
 
-      // if (this._dialect.supports.index.collate && field.collate) {
-      //   result += ` COLLATE ${this.quoteIdentifier(field.collate)}`;
-      // }
-
-      // if (this._dialect.supports.index.operator) {
-      //   const operator = field.operator || options.operator;
-      //   if (operator) {
-      //     result += ` ${operator}`;
-      //   }
-      // }
-
       if (this._dialect.supports.index.length && field.length) {
         result += `(${field.length})`;
       }
@@ -454,14 +443,6 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
     }
 
     options = Model._conformIndex(options);
-
-    // if (!this._dialect.supports.index.type) {
-    //   delete options.type;
-    // }
-
-    // if (options.where) {
-    //   options.where = this.whereQuery(options.where);
-    // }
 
     if (typeof tableName === 'string') {
       tableName = this.quoteIdentifiers(tableName);
@@ -1268,6 +1249,28 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
         }
       }
     }
+    const vectorFunctions = [
+      'COSINE_DISTANCE',
+      'INNER_PRODUCT',
+      'L1_DISTANCE',
+      'L2_DISTANCE',
+      'VECTOR_DISTANCE'
+    ];
+    if (smth instanceof Utils.Fn && vectorFunctions.includes(smth.fn)) {
+      smth.args[0] = this.quoteIdentifier(smth.args[0]);
+      smth.args[1] = `VECTOR('[${smth.args[1]}]')`;
+      return `${smth.fn}(${
+        smth.args.map(arg => {
+          if (arg instanceof Utils.SequelizeMethod) {
+            return this.handleSequelizeMethod(arg, tableName, factory, options, prepend);
+          }
+          if (_.isPlainObject(arg)) {
+            return this.whereItemsQuery(arg);
+          }
+          return arg;
+        }).join(', ')
+      })`;
+    }
     return super.handleSequelizeMethod(smth, tableName, factory, options, prepend);
   }
 
@@ -1414,27 +1417,6 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
   authTestQuery() {
     return 'SELECT 1+1 AS result FROM DUAL';
   }
-
-  cosineDistance(column, value) {
-    return `COSINE_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
-  }
-
-  innerProduct(column, value) {
-    return `INNER_PRODUCT(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
-  }
-
-  l1Distance(column, value) {
-    return `L1_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
-  }
-
-  l2Distance(column, value) {
-    return `L2_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
-  }
-
-  vectorDistance(column, value) {
-    return `VECTOR_DISTANCE(${this.quoteIdentifier(column)}, VECTOR('[${value}]'))`;
-  }
-
 }
 
 /* istanbul ignore next */
