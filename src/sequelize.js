@@ -996,13 +996,13 @@ class Sequelize {
    * @param {string} column 
    * @param {Array} value 
    * 
-   * @returns {string}
+   * @returns {Sequelize.fn}
    */
   cosineDistance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
       return this.fn('COSINE_DISTANCE', column, value);
     }
-    return '';
+    throw new Error(`cosineDistance for Dialect "${this.getDialect()}" is not implemented`);
   }
 
   /**
@@ -1011,13 +1011,13 @@ class Sequelize {
    * @param {string} column 
    * @param {Array} value 
    * 
-   * @returns {string}
+   * @returns {Sequelize.fn}
    */
   innerProduct(column, value) {
     if (['oracle'].includes(this.getDialect())) {
       return this.fn('INNER_PRODUCT', column, value);
     }
-    return '';
+    throw new Error(`innerProduct for Dialect "${this.getDialect()}" is not implemented`);
   }
 
   /**
@@ -1026,13 +1026,13 @@ class Sequelize {
    * @param {string} column 
    * @param {Array} value 
    * 
-   * @returns {string}
+   * @returns {Sequelize.fn}
    */
   l1Distance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
       return this.fn('L1_DISTANCE', column, value);
     }
-    return '';
+    throw new Error(`l1Distance for Dialect "${this.getDialect()}" is not implemented`);
   }
 
   /**
@@ -1041,13 +1041,13 @@ class Sequelize {
    * @param {string} column 
    * @param {Array} value 
    * 
-   * @returns {string}
+   * @returns {Sequelize.fn}
    */
   l2Distance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
       return this.fn('L2_DISTANCE', column, value);
     }
-    return '';
+    throw new Error(`l2Distance for Dialect "${this.getDialect()}" is not implemented`);
   }
 
   /**
@@ -1056,13 +1056,13 @@ class Sequelize {
    * @param {string} column 
    * @param {Array} value 
    * 
-   * @returns {string}
+   * @returns {Sequelize.fn}
    */
   vectorDistance(column, value) {
     if (['oracle'].includes(this.getDialect())) {
       return this.fn('VECTOR_DISTANCE', column, value);
     }
-    return '';
+    throw new Error(`vectorDistance for Dialect "${this.getDialect()}" is not implemented`);
   }
 
   /**

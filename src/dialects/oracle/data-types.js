@@ -2,8 +2,11 @@
 
 'use strict';
 
+const util = require('util');
 const moment = require('moment');
 const momentTz = require('moment-timezone');
+
+const sequelizeErrors = require('../../errors');
 
 module.exports = BaseTypes => {
   const warn = BaseTypes.ABSTRACT.warn.bind(
@@ -470,6 +473,14 @@ module.exports = BaseTypes => {
       }
 
       return 'VECTOR';
+    }
+
+    validate(value) {
+      // BYTES_PER_ELEMENT is static property only available in typedArrays. 
+      if (!value.constructor.BYTE_PER_ELEMENT) {
+        throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', value));
+      }
+      return true;
     }
 
     _getBindDef(oracledb) {

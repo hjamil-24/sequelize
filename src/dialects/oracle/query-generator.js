@@ -8,6 +8,7 @@ const AbstractQueryGenerator = require('../abstract/query-generator');
 const _ = require('lodash');
 const util = require('util');
 const Model = require('../../model');
+const sequelizeErrors = require('../../errors');
 const Transaction = require('../../transaction');
 
 /**
@@ -1257,18 +1258,15 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
       'VECTOR_DISTANCE'
     ];
     if (smth instanceof Utils.Fn && vectorFunctions.includes(smth.fn)) {
+      // The first argument is expected to be column name
+      // The second argument is expected to be array.
       smth.args[0] = this.quoteIdentifier(smth.args[0]);
+      if (!Array.isArray(smth.args[1])) {
+        throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', smth.args[1]));
+      }
       smth.args[1] = `VECTOR('[${smth.args[1]}]')`;
       return `${smth.fn}(${
-        smth.args.map(arg => {
-          if (arg instanceof Utils.SequelizeMethod) {
-            return this.handleSequelizeMethod(arg, tableName, factory, options, prepend);
-          }
-          if (_.isPlainObject(arg)) {
-            return this.whereItemsQuery(arg);
-          }
-          return arg;
-        }).join(', ')
+        smth.args.join(', ')
       })`;
     }
     return super.handleSequelizeMethod(smth, tableName, factory, options, prepend);

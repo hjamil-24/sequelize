@@ -971,12 +971,6 @@ class VECTOR extends ABSTRACT {
     this._format = options.format;
     this._length = options.dimension;
   }
-  validate(value) {
-    if (!ArrayBuffer.isView(value)) {
-      throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', value));
-    }
-    return true;
-  }
 }
 
 /**
