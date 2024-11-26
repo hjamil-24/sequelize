@@ -1258,6 +1258,9 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
       'VECTOR_DISTANCE'
     ];
     if (smth instanceof Utils.Fn && vectorFunctions.includes(smth.fn)) {
+      if (smth.args.length > 2) {
+        throw new Error('Too many arguments passed to similarity search function');
+      }
       // The first argument is expected to be column name
       // The second argument is expected to be array.
       smth.args[0] = this.quoteIdentifier(smth.args[0]);

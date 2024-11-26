@@ -477,10 +477,18 @@ module.exports = BaseTypes => {
 
     validate(value) {
       // BYTES_PER_ELEMENT is static property only available in typedArrays. 
-      if (!value.constructor.BYTE_PER_ELEMENT) {
+      if (!value.constructor.BYTE_PER_ELEMENT || !Array.isArray(value)) {
         throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', value));
       }
       return true;
+    }
+
+    _stringify(value, options) {
+      if (Array.isArray(value)) {
+        return Float64Array.from(value, val => val);
+      }
+
+      return value;
     }
 
     _getBindDef(oracledb) {
