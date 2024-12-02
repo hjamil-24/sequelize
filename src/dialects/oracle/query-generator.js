@@ -1265,7 +1265,9 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
       // The second argument is expected to be array.
       smth.args[0] = this.quoteIdentifier(smth.args[0]);
       if (!Array.isArray(smth.args[1])) {
-        throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', smth.args[1]));
+        if (typeof smth.args[1] === 'string' && !smth.args[1].startsWith('VECTOR')) {
+          throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', smth.args[1]));
+        }
       }
       smth.args[1] = `VECTOR('[${smth.args[1]}]')`;
       return `${smth.fn}(${

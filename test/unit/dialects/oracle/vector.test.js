@@ -83,7 +83,7 @@ if (current.dialect.name === 'oracle') {
     });
 
     describe('Vector where clause', () => {
-      const val = [1, 2, 3];
+      const queryVector = [1, 2, 3];
     
       const testsql = function(key, value, options, expectation) {
         if (expectation === undefined) {
@@ -96,7 +96,7 @@ if (current.dialect.name === 'oracle') {
         });
       };
 
-      testsql(current.fn('VECTOR_DISTANCE', 'embedding', val), {
+      testsql(current.fn('VECTOR_DISTANCE', 'embedding', queryVector), {
         [Op.lt]: 2
       }, {
         oracle: 'VECTOR_DISTANCE("embedding", VECTOR(\'[1,2,3]\')) < 2'
@@ -104,7 +104,7 @@ if (current.dialect.name === 'oracle') {
     });
 
     describe('order by distances', () => {
-      const val = [1, 2, 3, 4];
+      const queryVector = [1, 2, 3, 4];
       const testsql = (options, expectation) => {
         const model = options.model;
 
@@ -132,10 +132,47 @@ if (current.dialect.name === 'oracle') {
         model: User,
         attributes: ['embedding'],
         order: [
-          current.fn('VECTOR_DISTANCE', 'embedding', val)
+          current.fn('VECTOR_DISTANCE', 'embedding', queryVector)
         ]
       }, {
         oracle: 'SELECT "embedding" FROM "user" "User" ORDER BY VECTOR_DISTANCE("embedding", VECTOR(\'[1,2,3,4]\'));'
+      });
+    });
+
+    describe('limit', () => {
+      const queryVector = [1, 2, 3, 4];
+      const testsql = (options, expectation) => {
+        const model = options.model;
+
+        it(util.inspect(options, { depth: 2 }), () => {
+          return expectsql(
+            sql.selectQuery(
+              options.table || model && model.getTableName(),
+              options,
+              options.model
+            ),
+            expectation
+          );
+        });
+      };
+
+      const User = Support.sequelize.define('User', {
+        embedding: {
+          type: DataTypes.VECTOR(4)
+        }
+      }, {
+        tableName: 'user'
+      });
+
+      testsql({
+        model: User,
+        attributes: ['embedding'],
+        order: [
+          current.fn('VECTOR_DISTANCE', 'embedding', queryVector)
+        ],
+        limit: 5
+      }, {
+        oracle: 'SELECT "embedding" FROM "user" "User" ORDER BY VECTOR_DISTANCE("embedding", VECTOR(\'[1,2,3,4]\')) OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY;'
       });
     });
   });
