@@ -1,3 +1,5 @@
+// Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved
+
 'use strict';
 
 const util = require('util');

@@ -964,18 +964,9 @@ class TSVECTOR extends ABSTRACT {
  *
  */
 class VECTOR extends ABSTRACT {
-  /**
-   * @param {object} options type options
-   * @param {number} [options.dimension] dimension of vector column
-   * @param {string} [options.format] format of vector, i.e. INT8, FLOAT32, FLOAT64, BINARY
-   */
-  constructor(options = {}) {
+  constructor(dimension, format) {
     super();
-    if (typeof options === 'number') {
-      options = {
-        dimension: options
-      };
-    }
+    const options = typeof dimension === 'object' && dimension || { dimension, format };
     this.options = options;
     this._format = options.format;
     this._length = options.dimension;
