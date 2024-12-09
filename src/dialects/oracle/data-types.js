@@ -5,7 +5,6 @@
 const util = require('util');
 const moment = require('moment');
 const momentTz = require('moment-timezone');
-
 const sequelizeErrors = require('../../errors');
 
 module.exports = BaseTypes => {
@@ -487,7 +486,6 @@ module.exports = BaseTypes => {
       if (Array.isArray(value)) {
         return Float64Array.from(value, val => val);
       }
-
       return value;
     }
 
