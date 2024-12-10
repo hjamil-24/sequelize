@@ -8,7 +8,6 @@ const AbstractQueryGenerator = require('../abstract/query-generator');
 const _ = require('lodash');
 const util = require('util');
 const Model = require('../../model');
-const sequelizeErrors = require('../../errors');
 const Transaction = require('../../transaction');
 
 /**
@@ -425,10 +424,6 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
       }
 
       result += this.quoteIdentifier(field.name);
-
-      if (this._dialect.supports.index.length && field.length) {
-        result += `(${field.length})`;
-      }
 
       if (field.order) {
         result += ` ${field.order}`;
@@ -1261,10 +1256,20 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
       if (smth.args.length > 2) {
         throw new Error('Too many arguments passed to similarity search function');
       }
+
+      if (typeof smth.args[1] === 'string') {
+        if (!smth.args[1].startsWith('VECTOR')) {
+          throw new Error('Unexpected second argument');
+        }
+      } else if (!Array.isArray(smth.args[1])) {
+        throw new Error('Unexpected second argument');
+      }
       // The first argument is expected to be column name
       // The second argument is expected to be array.
       smth.args[0] = this.quoteIdentifier(smth.args[0]);
-      smth.args[1] = `VECTOR('[${smth.args[1]}]')`;
+      if (Array.isArray(smth.args[1])) {
+        smth.args[1] = `VECTOR('[${smth.args[1]}]')`;
+      }
       return `${smth.fn}(${
         smth.args.join(', ')
       })`;
