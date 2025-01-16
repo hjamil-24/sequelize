@@ -482,7 +482,7 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
         'ORAGANIZATION ',
         options.using === 'hnsw' ? 'INMEMORY NEIGHBOR GRAPH ' : 'NEIGHBOR PARTITION GRAPH ',
         options.distance ? `WITH DISTANCE ${options.distance}` : '',
-        //with target accuracy
+        options.accuracy ? `WITH TARGET ACCURACY ${options.accuracy}` : '',
         options.parameter ? idxParameter : ''
       );
     } else {
