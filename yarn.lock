@@ -7047,10 +7047,10 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
-oracledb@^6.6.0:
-  version "6.7.1"
-  resolved "https://registry.yarnpkg.com/oracledb/-/oracledb-6.7.1.tgz#a014132257db91f8de11010fc89c917d53b7e1d6"
-  integrity sha512-dOXqgJ8re9kw5Nv9zLlljhBcjsGCUELDD/VEecQlXl2R8IMNxJqdceR+VeKS4gAyVNzq0MOz45lXOiC8OqG1qw==
+oracledb@6.6.0:
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/oracledb/-/oracledb-6.6.0.tgz#bb40adbe81a84a1e544c48af9f120c61f030e936"
+  integrity sha512-T3dx+o3j+tVN53wQyr4yGTmoPHLy+a2V8yb1T2PmWrsj3ZlSt2Yu1BgV2yTDqnmBZYpRi/I3yJXRCOHHD7PiyA==
 
 ordered-read-streams@^1.0.0:
   version "1.0.1"
