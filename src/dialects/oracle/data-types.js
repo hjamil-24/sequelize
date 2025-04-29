@@ -2,8 +2,10 @@
 
 'use strict';
 
+const util = require('util');
 const moment = require('moment');
 const momentTz = require('moment-timezone');
+const sequelizeErrors = require('../../errors');
 
 module.exports = BaseTypes => {
   const warn = BaseTypes.ABSTRACT.warn.bind(
@@ -30,6 +32,7 @@ module.exports = BaseTypes => {
   BaseTypes.REAL.types.oracle = ['BINARY_DOUBLE'];
   BaseTypes.DOUBLE.types.oracle = ['BINARY_DOUBLE'];
   BaseTypes.JSON.types.oracle = ['BLOB'];
+  BaseTypes.VECTOR.types.oracle = ['VECTOR'];
   BaseTypes.GEOMETRY.types.oracle = false;
 
   class STRING extends BaseTypes.STRING {
@@ -459,6 +462,38 @@ module.exports = BaseTypes => {
 
   DATEONLY.prototype.escape = false;
 
+  class VECTOR extends BaseTypes.VECTOR {
+    toSql() {
+      if (this._length && this._format) {
+        return `VECTOR(${this._length}, ${this._format.toUpperCase()})`;
+      }
+      if (this._length) {
+        return `VECTOR(${this._length}, *)`;
+      }
+
+      return 'VECTOR';
+    }
+
+    validate(value) {
+      // BYTES_PER_ELEMENT is static property only available in typedArrays. 
+      if (!value.constructor.BYTE_PER_ELEMENT || !Array.isArray(value)) {
+        throw new sequelizeErrors.ValidationError(util.format('%j is not a valid array', value));
+      }
+      return true;
+    }
+
+    _stringify(value, options) {
+      if (Array.isArray(value)) {
+        return Float64Array.from(value, val => val);
+      }
+      return value;
+    }
+
+    _getBindDef(oracledb) {
+      return { type: oracledb.DB_TYPE_VECTOR };
+    }
+  }
+
   return {
     BOOLEAN,
     'DOUBLE PRECISION': DOUBLE,
@@ -481,6 +516,7 @@ module.exports = BaseTypes => {
     CHAR,
     JSON: JSONTYPE,
     REAL,
-    DECIMAL
+    DECIMAL,
+    VECTOR
   };
 };

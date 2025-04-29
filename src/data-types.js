@@ -958,6 +958,22 @@ class TSVECTOR extends ABSTRACT {
 }
 
 /**
+ * The VECTOR type stores vectors.
+ *
+ * Only available for Oracle Database >= 23ai
+ *
+ */
+class VECTOR extends ABSTRACT {
+  constructor(dimension, format) {
+    super();
+    const options = typeof dimension === 'object' && dimension || { dimension, format };
+    this.options = options;
+    this._format = options.format;
+    this._length = options.dimension;
+  }
+}
+
+/**
  * A convenience class holding commonly used data types. The data types are used when defining a new model using `Sequelize.define`, like this:
  * ```js
  * sequelize.define('model', {
@@ -1041,7 +1057,8 @@ const DataTypes = module.exports = {
   INET,
   MACADDR,
   CITEXT,
-  TSVECTOR
+  TSVECTOR,
+  VECTOR
 };
 
 _.each(DataTypes, (dataType, name) => {

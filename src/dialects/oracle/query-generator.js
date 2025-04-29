@@ -7,6 +7,7 @@ const DataTypes = require('../../data-types');
 const AbstractQueryGenerator = require('../abstract/query-generator');
 const _ = require('lodash');
 const util = require('util');
+const Model = require('../../model');
 const Transaction = require('../../transaction');
 
 /**
@@ -387,7 +388,114 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
     if (typeof tableName !== 'string' && attributes.name) {
       attributes.name = `${tableName.schema}.${attributes.name}`;
     }
-    return super.addIndexQuery(tableName, attributes, options, rawTablename);
+    
+    options = options || {};
+
+    if (!Array.isArray(attributes)) {
+      options = attributes;
+      attributes = undefined;
+    } else {
+      options.fields = attributes;
+    }
+
+    options.prefix = options.prefix || rawTablename || tableName;
+    if (options.prefix && typeof options.prefix === 'string') {
+      options.prefix = options.prefix.replace(/\./g, '_');
+      options.prefix = options.prefix.replace(/("|')/g, '');
+    }
+
+    const fieldsSql = options.fields.map(field => {
+      if (field instanceof Utils.SequelizeMethod) {
+        return this.handleSequelizeMethod(field);
+      }
+      if (typeof field === 'string') {
+        field = {
+          name: field
+        };
+      }
+      let result = '';
+
+      if (field.attribute) {
+        field.name = field.attribute;
+      }
+
+      if (!field.name) {
+        throw new Error(`The following index field has no name: ${util.inspect(field)}`);
+      }
+
+      result += this.quoteIdentifier(field.name);
+
+      if (field.order) {
+        result += ` ${field.order}`;
+      }
+
+      return result;
+    });
+
+    if (!options.name) {
+      // Mostly for cases where addIndex is called directly by the user without an options object (for example in migrations)
+      // All calls that go through sequelize should already have a name
+      options = Utils.nameIndex(options, options.prefix);
+    }
+
+    options = Model._conformIndex(options);
+
+    if (typeof tableName === 'string') {
+      tableName = this.quoteIdentifiers(tableName);
+    } else {
+      tableName = this.quoteTable(tableName);
+    }
+
+    let ind = ['CREATE'];
+
+    if (options.type === 'VECTOR') {
+      let idxParameter = 'PARAMETERS (type ';
+      options.using = options.using || 'hnsw';
+      if (options.parameter) {
+        if (options.using === 'hnsw') {
+          idxParameter += 'hnsw';
+          if (options.parameter.neighbor) {
+            idxParameter += `, neighbor ${options.parameter.neighbor}`; 
+          }
+          if (options.parameter.efconstruction) {
+            idxParameter += `, efconstruction ${options.parameter.efconstruction}`;
+          }
+        } else {
+          idxParameter += 'ivf';
+          if (options.parameter.partitions) {
+            idxParameter += `, NEIGHBOR PARTITION ${options.parameter.partitions}`;
+          }
+          if (options.parameter.samplesPerPartition) {
+            idxParameter += `, SAMPLES_PER_PARTITION ${options.parameter.samplesPerPartition}`;
+          }
+          if (options.parameter.minVectors) {
+            idxParameter += `, MIN_VECORS_PER_PARTITIONS ${options.parameter.minVectors}`;
+          }
+        }
+        idxParameter += ')';
+      }
+      ind = ind.concat(
+        options.type, 'INDEX',
+        this.quoteIdentifiers(options.name),
+        `ON ${tableName}`,
+        `(${fieldsSql.join(', ')})`,
+        'ORAGANIZATION ',
+        options.using === 'hnsw' ? 'INMEMORY NEIGHBOR GRAPH ' : 'NEIGHBOR PARTITION GRAPH ',
+        options.distance ? `WITH DISTANCE ${options.distance}` : '',
+        options.accuracy ? `WITH TARGET ACCURACY ${options.accuracy}` : '',
+        options.parameter ? idxParameter : ''
+      );
+    } else {
+      ind = ind.concat(
+        options.unique ? 'UNIQUE' : '',
+        'INDEX',
+        this.quoteIdentifiers(options.name),
+        `ON ${tableName}`,
+        `(${fieldsSql.join(', ')})`
+      );
+    }
+
+    return _.compact(ind).join(' ');
   }
 
   addConstraintQuery(tableName, options) {
@@ -1137,6 +1245,35 @@ export class OracleQueryGenerator extends AbstractQueryGenerator {
           return `${str} RETURNING TIMESTAMP WITH TIME ZONE)`;
         }
       }
+    }
+    const vectorFunctions = [
+      'COSINE_DISTANCE',
+      'INNER_PRODUCT',
+      'L1_DISTANCE',
+      'L2_DISTANCE',
+      'VECTOR_DISTANCE'
+    ];
+    if (smth instanceof Utils.Fn && vectorFunctions.includes(smth.fn)) {
+      if (smth.args.length > 2) {
+        throw new Error('Too many arguments passed to similarity search function');
+      }
+
+      if (typeof smth.args[1] === 'string') {
+        if (!smth.args[1].startsWith('VECTOR')) {
+          throw new Error('Unexpected second argument');
+        }
+      } else if (!Array.isArray(smth.args[1])) {
+        throw new Error('Unexpected second argument');
+      }
+      // The first argument is expected to be column name
+      // The second argument is expected to be array.
+      smth.args[0] = this.quoteIdentifier(smth.args[0]);
+      if (Array.isArray(smth.args[1])) {
+        smth.args[1] = `VECTOR('[${smth.args[1]}]')`;
+      }
+      return `${smth.fn}(${
+        smth.args.join(', ')
+      })`;
     }
     return super.handleSequelizeMethod(smth, tableName, factory, options, prepend);
   }

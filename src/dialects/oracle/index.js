@@ -36,8 +36,9 @@ OracleDialect.prototype.supports = _.merge(_.cloneDeep(AbstractDialect.prototype
     collate: false,
     length: false,
     parser: false,
-    type: false,
-    using: false
+    type: true,
+    operator: false,
+    using: true
   },
   constraints: {
     restrict: false

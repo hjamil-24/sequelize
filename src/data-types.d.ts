@@ -614,5 +614,10 @@ export const CITEXT: AbstractDataTypeConstructor;
  */
 export const TSVECTOR: AbstractDataTypeConstructor;
 
+/**
+ * VECTOR. Only available in Oracle Database.
+ */
+export const VECTOR: AbstractDataTypeConstructor;
+
 // umzug compatibility
 export type DataTypeAbstract = AbstractDataTypeConstructor;

@@ -991,6 +991,81 @@ class Sequelize {
   }
 
   /**
+   * Generates the cosineDistance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {Sequelize.fn}
+   */
+  cosineDistance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.fn('COSINE_DISTANCE', column, value);
+    }
+    throw new Error(`cosineDistance for Dialect "${this.getDialect()}" is not implemented`);
+  }
+
+  /**
+   * Generates the innerProduct clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {Sequelize.fn}
+   */
+  innerProduct(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.fn('INNER_PRODUCT', column, value);
+    }
+    throw new Error(`innerProduct for Dialect "${this.getDialect()}" is not implemented`);
+  }
+
+  /**
+   * Generates the l1Distance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {Sequelize.fn}
+   */
+  l1Distance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.fn('L1_DISTANCE', column, value);
+    }
+    throw new Error(`l1Distance for Dialect "${this.getDialect()}" is not implemented`);
+  }
+
+  /**
+   * Generates the cl2Distance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {Sequelize.fn}
+   */
+  l2Distance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.fn('L2_DISTANCE', column, value);
+    }
+    throw new Error(`l2Distance for Dialect "${this.getDialect()}" is not implemented`);
+  }
+
+  /**
+   * Generates the vectorDistance clause for Vector Columns
+   * 
+   * @param {string} column 
+   * @param {Array} value 
+   * 
+   * @returns {Sequelize.fn}
+   */
+  vectorDistance(column, value) {
+    if (['oracle'].includes(this.getDialect())) {
+      return this.fn('VECTOR_DISTANCE', column, value);
+    }
+    throw new Error(`vectorDistance for Dialect "${this.getDialect()}" is not implemented`);
+  }
+
+  /**
    * Creates an object representing a database function. This can be used in search queries, both in where and order parts, and as default values in column definitions.
    * If you want to refer to columns in your function, you should use `sequelize.col`, so that the columns are properly interpreted as columns and not a strings.
    *
